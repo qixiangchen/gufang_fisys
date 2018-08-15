@@ -1,0 +1,38 @@
+create table t_student(id int auto_increment primary key,
+	name varchar(50),grade varchar(30));
+	
+create table t_hobby(id int auto_increment primary key,
+	name varchar(50));
+	
+create table t_s2h(sid int,hid int);
+
+insert into t_hobby(name) values ('音乐');
+insert into t_hobby(name) values ('体育');
+insert into t_hobby(name) values ('美术');
+
+insert into t_student(name,grade) values('学生A','一');
+insert into t_student(name,grade) values('学生B','二');
+insert into t_student(name,grade) values('学生C','三');
+
+insert into t_s2h(sid,hid) values(1,1);
+insert into t_s2h(sid,hid) values(1,2);
+
+insert into t_s2h(sid,hid) values(2,2);
+insert into t_s2h(sid,hid) values(2,3);
+
+select * from t_s2h s2h,t_hobby h where s2h.hid=h.id
+
+select sid,group_concat(h.id) as hid, group_concat(h.name) as hname 
+	from t_s2h s2h,t_hobby h where s2h.hid=h.id group by s2h.sid;
+	
+内关联
+select a.* from t_student a,
+(select sid,group_concat(h.id) as hid, group_concat(h.name) as hname 
+	from t_s2h s2h,t_hobby h where s2h.hid=h.id group by s2h.sid) b
+where a.id=b.sid
+
+左外关联
+select a.*,b.hid,b.hname from t_student a left join
+(select sid,group_concat(h.id) as hid, group_concat(h.name) as hname 
+	from t_s2h s2h,t_hobby h where s2h.hid=h.id group by s2h.sid) b
+on a.id=b.sid;

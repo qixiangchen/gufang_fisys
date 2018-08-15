@@ -1,13 +1,10 @@
 D:\workspace\Proj_ssm\src\main\java\com\test\mapper\StuMapper.java
-D:\workspace\Proj_ssm\src\main\java\com\test\util\DubboClient.java
-D:\workspace\Proj_ssm\src\main\java\com\test\util\PageUtil.java
 D:\workspace\Proj_ssm\src\main\java\com\test\rabbitmq\ReceiveMsg.java
 D:\workspace\Proj_ssm\src\main\java\com\test\rabbitmq\SendMsg.java
 D:\workspace\Proj_ssm\src\main\java\com\test\bean\S2HInfo.java
 D:\workspace\Proj_ssm\src\main\java\com\test\bean\HobbyInfo.java
-D:\workspace\Proj_ssm\src\main\java\com\test\util\DubboStarter.java
 D:\workspace\Proj_ssm\src\main\java\com\test\bean\StudentPage.java
 D:\workspace\Proj_ssm\src\main\java\com\test\bean\StudentInfo.java
-D:\workspace\Proj_ssm\src\main\java\com\test\service\impl\StudentServiceImpl.java
+D:\workspace\Proj_ssm\src\main\java\com\test\util\PageUtil.java
 D:\workspace\Proj_ssm\src\main\java\com\test\service\IStudentService.java
 D:\workspace\Proj_ssm\src\main\java\com\test\ctrl\StudentCtrl.java

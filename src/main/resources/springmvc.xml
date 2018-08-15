@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 扫描控制器 -->
+	<context:component-scan base-package="com.test.ctrl"></context:component-scan>
+
+	<!-- 视图解析器 -->
+	<!-- jsp视图解析器 -->
+	<!-- 配置InternalResourceViewResolver -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+
+	<!-- 页面： templateLoaderPath + prefix + 视图名 + suffix -->
+	<!-- 模板位置 -->
+	<!-- <bean
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		模板包位置
+		<property name="templateLoaderPath" value="/WEB-INF"></property>
+		<property name="defaultEncoding" value="UTF-8"></property>
+		设置时间
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="number_format">#.##</prop>
+			</props>
+		</property>
+	</bean>
+
+	视图解析器
+	<bean
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="prefix" value="/ftl/"></property>
+		<property name="suffix" value=".ftl"></property>
+		UTF-8需要大写
+		<property name="contentType" value="text/html;charSet=UTF-8"></property>
+		<property name="requestContextAttribute" value="request"></property>
+	</bean> -->
+
+	<!-- 文件上传处理器,id是固定的 -->
+	<!-- Ctrl + Shift + T -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>	
+	</bean>
+
+	<!-- 注解驱动，静态资源 -->
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+</beans>

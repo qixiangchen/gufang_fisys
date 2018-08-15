@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+     <beans xmlns="http://www.springframework.org/schema/beans"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xmlns:context="http://www.springframework.org/schema/context"
+          xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+          xsi:schemaLocation="http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans.xsd 
+          http://www.springframework.org/schema/context 
+          http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/rabbit 
+          http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+
+     <rabbit:connection-factory id="connectionFactory"
+          host="127.0.0.1" username="guest" password="guest" port="5672"
+          virtual-host="/" 
+     />
+
+     <rabbit:admin connection-factory="connectionFactory" />
+
+
+     <rabbit:queue name="springrabbit_queue" durable="false"
+          auto-delete="false" exclusive="false" />
+
+
+     <rabbit:direct-exchange name="springrabbit_exg"
+          durable="false" auto-delete="false">
+          <rabbit:bindings>
+               <!-- key　Binding Key -->
+               <rabbit:binding queue="springrabbit_queue" key="direct" />
+          </rabbit:bindings>
+     </rabbit:direct-exchange>
+
+
+     <rabbit:template id="directTemplate" exchange="springrabbit_exg"
+          connection-factory="connectionFactory" message-converter="serializerMessageConverter" />
+
+	<!-- 
+     <bean id="sendMsg" class="com.test.rabbitmq.SendMsg">
+     	<property name="directTemplate" ref="directTemplate" />
+     </bean>
+     
+     <bean id="receiveMsg" class="com.test.rabbitmq.ReceiveMsg">
+     </bean>
+	-->
+     <bean id="serializerMessageConverter"
+          class="org.springframework.amqp.support.converter.SerializerMessageConverter" />
+
+     <rabbit:listener-container
+          connection-factory="connectionFactory" acknowledge="manual"
+          prefetch="1">
+          <rabbit:listener queues="springrabbit_queue" ref="receiveMsg" />
+     </rabbit:listener-container>
+
+</beans>
+
