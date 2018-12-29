@@ -88,3 +88,13 @@ create table gf_user(id varchar(32),
 	flag varchar(50),
 	testmode varchar(10)
 );
+
+create table gf_role(id varchar(32),
+	name varchar(100),
+	description varchar(200),
+	flag varchar(50));
+create table gf_orguserrole(id varchar(32),
+	entityid varchar(32),
+	entitytype varchar(10),
+	roleid varchar(32),
+	flag varchar(50));

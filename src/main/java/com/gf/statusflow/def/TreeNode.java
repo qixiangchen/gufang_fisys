@@ -1,6 +1,8 @@
 package com.gf.statusflow.def;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TreeNode {
@@ -10,6 +12,8 @@ public class TreeNode {
 	private String url = null;
 	private String state = "closed";
 	private Map<String,Object> attributes = new HashMap<String,Object>();
+	private List<TreeNode> children = new ArrayList<TreeNode>();
+	
 	public String getId() {
 		return id;
 	}
@@ -51,6 +55,16 @@ public class TreeNode {
 		if(attributes == null)
 			attributes = new HashMap<String,Object>();
 		attributes.put(key, value);
+	}
+	public List<TreeNode> getChildren() {
+		return children;
+	}
+	public void setChildren(List<TreeNode> children) {
+		this.children = children;
+	}
+	public void addChild(TreeNode tn)
+	{
+		children.add(tn);
 	}
 	
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gf.statusflow.def.DefaultOrg;
+import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
 import com.gf.statusflow.def.TreeNode;
 import com.github.pagehelper.PageHelper;
@@ -150,6 +151,25 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
+	@RequestMapping("/userquery")
+	@ResponseBody
+	public Map userquery(Integer page,Integer rows,String qname)
+	{
+		if(page == null)
+			page = 1;
+		if(rows == null)
+			rows = 10;
+		Map m = new HashMap();
+		PageHelper.startPage(page,rows);
+		List<DefaultUser> list = orgmodel.findUserByName(qname);
+		PageInfo pi = new PageInfo(list);
+		Long total = pi.getTotal();
+		List<DefaultUser> users = pi.getList();
+		m.put("total", total);
+		m.put("rows", users);
+		return m;
+	}
+	
 	@RequestMapping("/usersave")
 	@ResponseBody
 	public Boolean usersave(DefaultUser duser)
@@ -183,5 +203,89 @@ public class OrgModelCtrl {
 			orgmodel.updateUser(duser);
 		}
 		return true;
+	}
+	
+	@RequestMapping("/role")
+	public String role()
+	{
+		return "/orgmodel/role";
+	}
+	
+	@RequestMapping("/roleload")
+	@ResponseBody
+	public Map roleload(Integer page,Integer rows)
+	{
+		if(page == null)
+			page = 1;
+		if(rows == null)
+			rows = 10;
+		Map m = new HashMap();
+		PageHelper.startPage(page,rows);
+		List<DefaultRole> list = orgmodel.getAllRole();
+		PageInfo pi = new PageInfo(list);
+		Long total = pi.getTotal();
+		List<DefaultRole> users = pi.getList();
+		m.put("total", total);
+		m.put("rows", users);
+		return m;
+	}
+	
+	@RequestMapping("/rolesave")
+	@ResponseBody
+	public Boolean rolesave(DefaultRole role)
+	{
+		log.debug("rolesave role="+role);
+		String id = role.getId();
+		if("".equals(Util.fmtStr(id)))
+		{
+			id = UUID.create("role");
+			role.setId(id);
+			orgmodel.saveRole(role);
+		}
+		else
+		{
+			orgmodel.updateRole(role);
+		}
+		return true;
+	}
+	
+	@RequestMapping("/roledelete")
+	@ResponseBody
+	public Boolean roledelete(String[] id)
+	{
+		log.debug("roledelete id="+id);
+		if(id != null)
+		{
+			for(String id2:id)
+				orgmodel.deleteRole(id2);
+		}
+		return true;
+	}
+	
+	@RequestMapping("/roleuser")
+	public String orguserrole()
+	{
+		return "/orgmodel/orguserrole";
+	}
+	
+	@RequestMapping("/roleroot")
+	@ResponseBody
+	public List<TreeNode> roleroot()
+	{
+		List<TreeNode> rtn = new ArrayList<TreeNode>();
+		TreeNode root = new TreeNode();
+		root.setId("root");
+		root.setText("角色树");
+		rtn.add(root);
+		List<DefaultRole> roles = orgmodel.getAllRole();
+		for(DefaultRole role:roles)
+		{
+			TreeNode tn = new TreeNode();
+			tn.setId(role.getId());
+			tn.setText(role.getName());
+			root.addChild(tn);
+		}
+
+		return rtn;
 	}
 }

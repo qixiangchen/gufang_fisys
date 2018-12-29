@@ -233,6 +233,9 @@
 	<delete id="deleteUser">
 		delete from gf_user where id=#{id}
 	</delete>
+	<select id="findUserByName" resultType="com.gf.statusflow.def.DefaultUser">
+		select * from gf_user where name like '%${qname}%' or loginid like '%${qname}%'
+	</select>
 	<select id="getUserByOrgId" resultType="com.gf.statusflow.def.DefaultUser">
 		select * from gf_user where orgid=#{orgId}
 	</select>
@@ -247,5 +250,36 @@
 	</select>
 	<select id="checkLogin" resultType="com.gf.statusflow.def.DefaultUser">
 		select * from gf_user where loginid=#{loginId} and password=#{password}
+	</select>
+	
+	<!-- 角色相关SQL -->
+	<insert id="saveRole" parameterType="com.gf.statusflow.def.DefaultRole">
+		insert into gf_role(id,name,description,flag)
+			values(#{id},#{name},#{description},#{flag})
+	</insert>
+	<update id="updateRole" parameterType="com.gf.statusflow.def.DefaultRole">
+		update gf_role set name=#{name},description=#{description},flag=#{flag}
+			where id=#{id}
+	</update>
+	<delete id="deleteRole">
+		delete from gf_role where id=#{id}
+	</delete>
+	<select id="getAllRole" resultType="com.gf.statusflow.def.DefaultRole">
+		select * from gf_role
+	</select>
+	<select id="getRoleById" resultType="com.gf.statusflow.def.DefaultRole">
+		select * from gf_role where id=#{id}
+	</select>
+	
+	<!-- 部门与角色，用户与角色相关SQL -->
+	<insert id="saveOrgUserRole" parameterType="com.gf.statusflow.def.DefaultOrgUserRole">
+		insert into gf_orguserrole(id,entityid,entitytype,roleid,flag)
+			values(#{id},#{entityId},#{entityType},#{roleId},#{flag})
+	</insert>
+	<delete id="deleteOrgUserRoleByEntityId">
+		delete from gf_orguserrole where entityid=#{entityId}
+	</delete>
+	<select id="getOrgUserRoleByEntityId" resultType="com.gf.statusflow.def.DefaultOrgUserRole">
+		select * from gf_orguserrole where entityid=#{entityId}
 	</select>
 </mapper>

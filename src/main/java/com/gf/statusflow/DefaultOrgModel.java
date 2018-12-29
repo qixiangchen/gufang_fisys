@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.gf.statusflow.def.DefaultOrg;
+import com.gf.statusflow.def.DefaultOrgUserRole;
+import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
 
 @Component
@@ -145,6 +147,19 @@ public class DefaultOrgModel implements IOrgModel{
 			log.error(e.getMessage());
 		}
 	}
+	
+	@Override
+	public List<DefaultUser> findUserByName(String qname) {
+		try
+		{
+			return mapper.findUserByName(qname);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
 
 	@Override
 	public List<DefaultUser> getUserByOrgId(String orgId) {
@@ -243,6 +258,105 @@ public class DefaultOrgModel implements IOrgModel{
 	@Override
 	public List<IOrgUserRole> getOrgUserRoleListByRoleId(String roleId) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * 角色相关Mybatis方法
+	 */
+	@Override
+	public void saveRole(DefaultRole role) {
+		try
+		{
+			mapper.saveRole(role);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	@Override
+	public void updateRole(DefaultRole role) {
+		try
+		{
+			mapper.updateRole(role);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	@Override
+	public void deleteRole(String id) {
+		try
+		{
+			mapper.deleteRole(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	@Override
+	public List<DefaultRole> getAllRole() {
+		try
+		{
+			return mapper.getAllRole();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	@Override
+	public DefaultRole getRoleById(String id) {
+		try
+		{
+			return mapper.getRoleById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 部门与角色，用户与角色相关SQ
+	 */
+	@Override
+	public void saveOrgUserRole(DefaultOrgUserRole our) {
+		try
+		{
+			mapper.saveOrgUserRole(our);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	@Override
+	public void deleteOrgUserRoleByEntityId(String entityId) {
+		try
+		{
+			mapper.deleteOrgUserRoleByEntityId(entityId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	@Override
+	public List<DefaultOrgUserRole> getOrgUserRoleByEntityId(String entityId) {
+		try
+		{
+			return mapper.getOrgUserRoleByEntityId(entityId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
 		return null;
 	}
 

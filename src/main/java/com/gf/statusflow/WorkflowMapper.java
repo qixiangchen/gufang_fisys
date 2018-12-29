@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.gf.statusflow.def.DefWorkItem;
 import com.gf.statusflow.def.DefaultOrg;
+import com.gf.statusflow.def.DefaultOrgUserRole;
+import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
 
 @Mapper
@@ -30,6 +32,7 @@ public interface WorkflowMapper {
 	public void saveUser(DefaultUser user);
 	public void updateUser(DefaultUser user);
 	public void deleteUser(@Param("id") String id);
+	public List<DefaultUser> findUserByName(@Param("qname") String qname);
 	public List<DefaultUser> getUserByOrgId(@Param("orgId") String orgId);
 	public DefaultUser getManagerById(@Param("userId") String userId);
 	public List<DefaultUser> getUserByManagerId(@Param("managerId") String managerId);
@@ -37,6 +40,26 @@ public interface WorkflowMapper {
 			@Param("password") String password);
 	public DefaultUser getUserByLoginId(@Param("loginId") String loginId);
 	
+	/**
+	 * 角色相关Mybatis方法
+	 */
+	public void saveRole(DefaultRole role);
+	public void updateRole(DefaultRole role);
+	public void deleteRole(@Param("id") String id);
+	public List<DefaultRole> getAllRole();
+	public DefaultRole getRoleById(@Param("id") String id);
+	
+	/**
+	 * 部门与角色，用户与角色相关SQ
+	 */
+	public void saveOrgUserRole(DefaultOrgUserRole our);
+	public void deleteOrgUserRoleByEntityId(@Param("entityId") String entityId);
+	public List<DefaultOrgUserRole> getOrgUserRoleByEntityId(@Param("entityId") String entityId);
+	
+	/**]
+	 * 工作流相关Mybatis方法
+	 * @param dwi
+	 */
 	public void saveWorkitem(DefWorkItem dwi);
 	public void updateWorkitem(DefWorkItem dwi);
 	public void deleteWorkitem(String id);
