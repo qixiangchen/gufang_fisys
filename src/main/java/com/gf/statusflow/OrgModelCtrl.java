@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gf.statusflow.def.DefaultOrg;
+import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
 import com.gf.statusflow.def.TreeNode;
@@ -170,6 +171,39 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
+	@RequestMapping("/userrolequery")
+	@ResponseBody
+	public Map userrolequery(Integer page,Integer rows,String userId)
+	{
+		if(page == null)
+			page = 1;
+		if(rows == null)
+			rows = 10;
+		Map m = new HashMap();
+		PageHelper.startPage(page,rows);
+		List<Map> list = orgmodel.getUserRoleList(userId);
+		PageInfo pi = new PageInfo(list);
+		Long total = pi.getTotal();
+		List<Map> users = pi.getList();
+		m.put("total", total);
+		m.put("rows", users);
+		return m;
+	}
+	
+	@RequestMapping("/userroledel")
+	@ResponseBody
+	public Boolean userroledel(String[] id)
+	{
+		if(id != null)
+		{
+			for(String id2:id)
+			{
+				orgmodel.deleteOrgUserRoleById(id2);
+			}
+		}
+		return true;
+	}
+	
 	@RequestMapping("/usersave")
 	@ResponseBody
 	public Boolean usersave(DefaultUser duser)
@@ -287,5 +321,36 @@ public class OrgModelCtrl {
 		}
 
 		return rtn;
+	}
+	
+	@RequestMapping("/roleassign")
+	@ResponseBody
+	public Boolean roleassign(String roleId,String userId)
+	{
+		if(roleId != null && userId != null)
+		{
+			String[] roleDim = roleId.split(",");
+			String[] userDim = userId.split(",");
+			for(String roleId2:roleDim)
+			{
+				for(String userId2:userDim)
+				{
+					List<DefaultOrgUserRole> chkList = orgmodel.getOrgUserRoleByRoleIdEntityId(roleId2,userId2);
+					if(chkList==null || chkList.size() == 0)
+					{
+						DefaultOrgUserRole dour = new DefaultOrgUserRole();
+						String id = UUID.create("dour");
+						dour.setId(id);
+						dour.setEntityId(userId2);
+						dour.setEntityType(DefaultOrgUserRole.USER);
+						dour.setRoleId(roleId2);
+						orgmodel.saveOrgUserRole(dour);
+					}
+				}
+			}
+			return true;
+		}
+		else
+			return false;
 	}
 }

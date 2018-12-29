@@ -234,7 +234,11 @@
 		delete from gf_user where id=#{id}
 	</delete>
 	<select id="findUserByName" resultType="com.gf.statusflow.def.DefaultUser">
-		select * from gf_user where name like '%${qname}%' or loginid like '%${qname}%'
+		select u.*,b.roleName from gf_user u
+		left join
+		(select our.entityid,group_concat(r.name) roleName from gf_orguserrole our,gf_role r where our.roleid=r.id group by our.entityid) b
+		on u.id=b.entityid
+		where name like '%${qname}%' or loginid like '%${qname}%'
 	</select>
 	<select id="getUserByOrgId" resultType="com.gf.statusflow.def.DefaultUser">
 		select * from gf_user where orgid=#{orgId}
@@ -279,7 +283,16 @@
 	<delete id="deleteOrgUserRoleByEntityId">
 		delete from gf_orguserrole where entityid=#{entityId}
 	</delete>
+	<delete id="deleteOrgUserRoleById">
+		delete from gf_orguserrole where id=#{id}
+	</delete>
 	<select id="getOrgUserRoleByEntityId" resultType="com.gf.statusflow.def.DefaultOrgUserRole">
 		select * from gf_orguserrole where entityid=#{entityId}
+	</select>
+	<select id="getOrgUserRoleByRoleIdEntityId" resultType="com.gf.statusflow.def.DefaultOrgUserRole">
+		select * from gf_orguserrole where roleId=#{roleId} and entityid=#{entityId}
+	</select>
+	<select id="getUserRoleList" resultType="Map">
+		select our.id,u.name,u.id userId,r.name roleName from gf_user u,gf_orguserrole our,gf_role r where u.id=our.entityid and our.roleid=r.id and our.entityid=#{userId}
 	</select>
 </mapper>

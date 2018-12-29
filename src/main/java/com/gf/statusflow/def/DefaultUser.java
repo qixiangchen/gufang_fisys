@@ -33,6 +33,8 @@ public class DefaultUser implements IUser{
 	private String flag = "gf";
 	private String testMode = null;
 	private List<String> roleList = new ArrayList<String>();
+	//冗余字段
+	private String roleName = null;
 	
 	@Override
 	public String getId() {
@@ -243,6 +245,12 @@ public class DefaultUser implements IUser{
 		this.testMode = testMode;
 	}
 	
+	public String getRoleName() {
+		return roleName;
+	}
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
 	public String toString()
 	{
 		return "DefaultUser[id="+id+",loginId="+loginId+",password="+password+",name="+name+",address="+address+",companyMail="+companyMail

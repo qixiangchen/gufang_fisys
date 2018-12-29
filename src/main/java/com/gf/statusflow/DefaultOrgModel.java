@@ -1,6 +1,7 @@
 package com.gf.statusflow;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -347,6 +348,32 @@ public class DefaultOrgModel implements IOrgModel{
 			log.error(e.getMessage());
 		}
 	}
+	public void deleteOrgUserRoleById(String id)
+	{
+		try
+		{
+			mapper.deleteOrgUserRoleById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public List<DefaultOrgUserRole> getOrgUserRoleByRoleIdEntityId(String roleId,
+			String entityId)
+	{
+		try
+		{
+			return mapper.getOrgUserRoleByRoleIdEntityId(roleId,entityId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	@Override
 	public List<DefaultOrgUserRole> getOrgUserRoleByEntityId(String entityId) {
 		try
@@ -360,4 +387,16 @@ public class DefaultOrgModel implements IOrgModel{
 		return null;
 	}
 
+	public List<Map> getUserRoleList(String userId)
+	{
+		try
+		{
+			return mapper.getUserRoleList(userId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
 }

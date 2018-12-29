@@ -1,6 +1,7 @@
 package com.gf.statusflow;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -55,7 +56,10 @@ public interface WorkflowMapper {
 	public void saveOrgUserRole(DefaultOrgUserRole our);
 	public void deleteOrgUserRoleByEntityId(@Param("entityId") String entityId);
 	public List<DefaultOrgUserRole> getOrgUserRoleByEntityId(@Param("entityId") String entityId);
-	
+	public List<Map> getUserRoleList(@Param("userId") String userId);
+	public void deleteOrgUserRoleById(@Param("id") String id);
+	public List<DefaultOrgUserRole> getOrgUserRoleByRoleIdEntityId(@Param("roleId") String roleId,
+		@Param("entityId") String entityId);
 	/**]
 	 * 工作流相关Mybatis方法
 	 * @param dwi

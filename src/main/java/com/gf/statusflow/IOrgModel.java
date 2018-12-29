@@ -1,6 +1,7 @@
 package com.gf.statusflow;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -53,6 +54,10 @@ public interface IOrgModel
 	public void saveOrgUserRole(DefaultOrgUserRole our);
 	public void deleteOrgUserRoleByEntityId(String entityId);
 	public List<DefaultOrgUserRole> getOrgUserRoleByEntityId(String entityId);
+	public List<Map> getUserRoleList(String userId);
+	public void deleteOrgUserRoleById(String id);
+	public List<DefaultOrgUserRole> getOrgUserRoleByRoleIdEntityId(String roleId,
+			String entityId);
 	
 	/**
 	 * 工作流引擎中调用组织机构的方法

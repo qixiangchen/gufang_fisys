@@ -45,13 +45,50 @@ function saveroleuser()
 	var userid = '';
 	for(var i=0;i<users.length;i++)
 		userid = userid + users[i].id;
-	alert(userid);
+	$.ajax({
+		url:'/roleassign?roleId='+roleid+"&userId="+userid,
+		success:function(data)
+		{
+			queryuser();
+		}
+	})
+}
+function openuser(index, row)
+{
+	$('#win').window('open');
+	var userId = row.id;
+	$('#userroledg').datagrid({
+		url:'/userrolequery?userId='+userId
+	})
+}
+function deluserrole()
+{
+	var objs = $('#userroledg').datagrid('getChecked');
+	var id = '';
+	for(i=0;i<objs.length;i++)
+	{
+		id = id + objs[i].id + ',';
+		userId = objs[i].userId;
+	}
+	$.ajax({
+		url:'/userroledel?id='+id,
+		success:function(data)
+		{
+			$('#userroledg').datagrid({
+				url:'/userrolequery?userId='+userId
+			})
+		}
+	})
 }
 $(document).ready(
 		function()
 		{
 			reloadtree();
 			$('#win').window('close');
+			
+			$('#userdg').datagrid({
+				'onClickRow':openuser
+			})
 		}
 	);		
 </script>
@@ -70,27 +107,8 @@ $(document).ready(
 		        	<th data-options="field:'id',width:100,checkbox:true">ID</th>   
 		            <th data-options="field:'loginId',width:100">登录ID</th>   
 		            <th data-options="field:'name',width:100">姓名</th>   
-		            <th data-options="field:'address',width:100">地址</th>
-		            <th data-options="field:'companyMail',width:100">公司邮箱</th>  
-		            <th data-options="field:'privateMail',width:100">私人邮箱</th>  
-		            <th data-options="field:'companyTeleNo',width:100">公司电话</th>
-		            <th data-options="field:'homeTeleNo',width:100">家庭电话</th>
 		            <th data-options="field:'mobile',width:100">手机</th>
-		            <th data-options="field:'title',width:100">职位</th>
-		            <th data-options="field:'desc',width:100,hidden:true">ID</th>
-		            <th data-options="field:'orgId',width:100,hidden:true">ID</th>
-		            <th data-options="field:'orgPath',width:100,hidden:true">ID</th>
-		            <th data-options="field:'enabled',width:100,hidden:true">ID</th>
-		            <th data-options="field:'locked',width:100,hidden:true">ID</th>
-		            <th data-options="field:'managerId',width:100,hidden:true">ID</th>
-		            <th data-options="field:'birthday',width:100,hidden:true">ID</th>
-		            <th data-options="field:'cardId',width:100,hidden:true">ID</th>
-		            <th data-options="field:'failureDate',width:100,hidden:true">ID</th>
-		            <th data-options="field:'failureCount',width:100,hidden:true">ID</th>
-		            <th data-options="field:'openid',width:100,hidden:true">ID</th>
-		            <th data-options="field:'seqno',width:100,hidden:true">ID</th>
-		            <th data-options="field:'flag',width:100,hidden:true">ID</th>
-		            <th data-options="field:'testMode',width:100,hidden:true">ID</th>
+					<th data-options="field:'roleName',width:100">已分配角色</th>
 		        </tr>   
 		    </thead>   
 		</table>
@@ -99,6 +117,27 @@ $(document).ready(
 			<a id="btn" onclick="queryuser()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
 			<a id="btn" onclick="saveroleuser()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">保存</a>
 		</div>
+		
+		<div id="win" class="easyui-window" title="用户角色授权窗口" style="width:600px;height:320px"   
+		        data-options="iconCls:'icon-save',modal:true">   
+		    <div class="easyui-layout" data-options="fit:true">  
+				<table id="userroledg" class="easyui-datagrid" style="width:100%;height:250px"   
+				        data-options="url:'/userrolequery',fitColumns:true,pagination:true,
+				        pageSize:10,pageList:[10,50,100,200]">   
+				    <thead>   
+				        <tr>
+				        	<th data-options="field:'id',width:100,checkbox:true">ID</th>    
+				            <th data-options="field:'name',width:100">姓名</th>
+				            <th data-options="field:'userId',width:100">姓名</th>     
+							<th data-options="field:'roleName',width:100">角色</th>
+				        </tr>   
+				    </thead>   
+				</table>
+				<a id="btn" onclick="deluserrole()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">删除</a>
+				<a id="btn" onclick="closeuserrole()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">关闭</a>
+			</div>
+		</div>
+
     </div>
 </body>
 </html>
