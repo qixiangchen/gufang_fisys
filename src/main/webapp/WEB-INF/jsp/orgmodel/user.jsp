@@ -98,6 +98,9 @@ function chkpwd()
 function adduser()
 {
 	$('#win').window('open');
+	$('#frm').form('clear');
+	$('#enabled').combobox('setValue','0');
+	$('#locked').combobox('setValue','no');
 }
 function closeuser()
 {
@@ -108,16 +111,16 @@ function saveuser()
 	var rtn = $('#frm').form('validate');
 	if(rtn)
 	{
-		orgId = $('#orgId').val();
+		orgId = $('#orgId').combobox('getValue');
 		$('#frm').form('submit', {    
 		    url:'/usersave',    
 		    onSubmit: function(){    
 	  
 		    },    
-		    success:function(data){    
+		    success:function(data){
 		    	loaddatagrid(orgId);
 		    	closeuser();
-		    }    
+		    }
 		});
 	}
 }
@@ -131,7 +134,7 @@ function openuser(index,rowObj)
 	$('#testMode').val(rowObj.testMode);
 	$('#loginId').textbox('setValue',rowObj.loginId);
 	$('#name').textbox('setValue',rowObj.name);
-	$('#password').passwordbox('setValue',rowObj.password);
+	//$('#password').passwordbox('setValue',rowObj.password);
 	$('#companyMail').textbox('setValue',rowObj.companyMail);
 	$('#privateMail').textbox('setValue',rowObj.privateMail);
 	$('#address').textbox('setValue',rowObj.address);
@@ -267,7 +270,7 @@ $(document).ready(
 							</select> 
 					    </div>
 					    <div style="margin-left:50px;margin-top:10px">
-							<select id="enabled" name="enabled" class="easyui-combobox" data-options="width:250,label:'是否锁定:'" >   
+							<select id="locked" name="locked" class="easyui-combobox" data-options="width:250,label:'是否锁定:'" >   
 							    <option value="no">正常</option>   
 							    <option value="yes">已锁</option>     
 							</select>   

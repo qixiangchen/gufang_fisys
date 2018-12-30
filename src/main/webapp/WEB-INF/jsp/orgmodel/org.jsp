@@ -83,7 +83,9 @@ function reloadtree()
 $(document).ready(
 	function()
 	{
+		//加载树控件根节点
 		reloadtree();
+		//设计树控件事件响应规则，当点击树的某节点时执行这些方法
 		$('#tree').tree({
 			onBeforeExpand:function(node,param)
 			{
