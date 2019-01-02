@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,16 @@ public class OrgModelCtrl {
 	private Logger log = LoggerFactory.getLogger(OrgModelCtrl.class); 
 	@Autowired
 	private IOrgModel orgmodel;
-		
-	@RequestMapping("/org")
+
+	@RequiresPermissions("url:org.action")
+	@RequestMapping("/org.action")
 	public String org()
 	{
 		return "/orgmodel/org";
 	}
 	
-	@RequestMapping("/orgroot")
+	@RequiresPermissions("url:orgroot.action")
+	@RequestMapping("/orgroot.action")
 	@ResponseBody
 	public List<TreeNode> orgroot()
 	{
@@ -48,7 +51,8 @@ public class OrgModelCtrl {
 		return roots;
 	}
 	
-	@RequestMapping("/orgchild")
+	@RequiresPermissions("url:orgchild.action")
+	@RequestMapping("/orgchild.action")
 	@ResponseBody
 	public List<TreeNode> orgchild(String id)
 	{
@@ -61,7 +65,8 @@ public class OrgModelCtrl {
 		return roots;
 	}
 	
-	@RequestMapping("/orgsubsave")
+	@RequiresPermissions("url:orgsubsave.action")
+	@RequestMapping("/orgsubsave.action")
 	@ResponseBody
 	public Boolean orgsubsave(DefaultOrg org)
 	{
@@ -69,7 +74,8 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/orgsave")
+	@RequiresPermissions("url:orgsave.action")
+	@RequestMapping("/orgsave.action")
 	@ResponseBody
 	public Boolean orgsave(DefaultOrg org)
 	{
@@ -77,14 +83,16 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/orgload")
+	@RequiresPermissions("url:orgload.action")
+	@RequestMapping("/orgload.action")
 	@ResponseBody
 	public List<DefaultOrg> orgload()
 	{
 		return orgmodel.getAllOrg();
 	}
 	
-	@RequestMapping("/orgdelete")
+	@RequiresPermissions("url:orgdelete.action")
+	@RequestMapping("/orgdelete.action")
 	@ResponseBody
 	public String orgdelete(String id)
 	{
@@ -126,7 +134,7 @@ public class OrgModelCtrl {
 		return tn;
 	}
 	
-	@RequestMapping("/user")
+	@RequestMapping("/user.action")
 	public String user()
 	{
 		return "/orgmodel/user";
@@ -157,7 +165,7 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
-	@RequestMapping("/userquery")
+	@RequestMapping("/userquery.action")
 	@ResponseBody
 	public Map userquery(Integer page,Integer rows,String qname)
 	{
@@ -176,7 +184,7 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
-	@RequestMapping("/userrolequery")
+	@RequestMapping("/userrolequery.action")
 	@ResponseBody
 	public Map userrolequery(Integer page,Integer rows,String userId)
 	{
@@ -195,7 +203,7 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
-	@RequestMapping("/userroledel")
+	@RequestMapping("/userroledel.action")
 	@ResponseBody
 	public Boolean userroledel(String[] id)
 	{
@@ -209,7 +217,7 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/usersave")
+	@RequestMapping("/usersave.action")
 	@ResponseBody
 	public Boolean usersave(DefaultUser duser)
 	{
@@ -244,13 +252,13 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/role")
+	@RequestMapping("/role.action")
 	public String role()
 	{
 		return "/orgmodel/role";
 	}
 	
-	@RequestMapping("/roleload")
+	@RequestMapping("/roleload.action")
 	@ResponseBody
 	public Map roleload(Integer page,Integer rows)
 	{
@@ -269,7 +277,7 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
-	@RequestMapping("/rolesave")
+	@RequestMapping("/rolesave.action")
 	@ResponseBody
 	public Boolean rolesave(DefaultRole role)
 	{
@@ -288,7 +296,7 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/roledelete")
+	@RequestMapping("/roledelete.action")
 	@ResponseBody
 	public Boolean roledelete(String[] id)
 	{
@@ -301,13 +309,13 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/roleuser")
+	@RequestMapping("/roleuser.action")
 	public String orguserrole()
 	{
 		return "/orgmodel/orguserrole";
 	}
 	
-	@RequestMapping("/roleroot")
+	@RequestMapping("/roleroot.action")
 	@ResponseBody
 	public List<TreeNode> roleroot()
 	{
@@ -328,7 +336,7 @@ public class OrgModelCtrl {
 		return rtn;
 	}
 	
-	@RequestMapping("/roleassign")
+	@RequestMapping("/roleassign.action")
 	@ResponseBody
 	public Boolean roleassign(String roleId,String userId)
 	{

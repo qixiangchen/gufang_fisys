@@ -13,13 +13,13 @@ insert into  gf_function(id,name,url,priority,icon,parentid)
 insert into  gf_function(id,name,url,priority,icon,parentid)
 	values('org','组织管理','',1,'','sysadmin');
 insert into  gf_function(id,name,url,priority,icon,parentid)
-	values('dept','部门管理','/org',0,'','org');
+	values('dept','部门管理','/org.action',0,'','org');
 insert into  gf_function(id,name,url,priority,icon,parentid)
-	values('user','用户管理','/user',1,'','org');
+	values('user','用户管理','/user.action',1,'','org');
 insert into  gf_function(id,name,url,priority,icon,parentid)
-	values('role','角色管理','/role',2,'','org');
+	values('role','角色管理','/role.action',2,'','org');
 insert into  gf_function(id,name,url,priority,icon,parentid)
-	values('roleuser','角色授权','/roleuser',3,'','org');
+	values('roleuser','角色授权','/roleuser.action',3,'','org');
 insert into  gf_function(id,name,url,priority,icon,parentid)
 	values('permission','权限分配','',2,'','sysadmin');
 	

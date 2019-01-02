@@ -112,6 +112,7 @@ public class FunctionServiceImpl implements FunctionService{
 				recurseFunction(userId,id,sb2);
 				sb2.append("</div>\r\n");
 			}
+			sb.append("<a class=\"easyui-linkbutton\" style=\"background:#B3DFDA;\" data-options=\"plain:true\" onclick=\"logout()\">退出系统</a>\r\n");
 			sb.append("</div>\r\n");
 			String menu = sb.toString()+sb2.toString();
 			return menu;

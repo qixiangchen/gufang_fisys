@@ -3,11 +3,11 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<script type="text/javascript" src="/easyui/jquery.min.js"></script>
-<script type="text/javascript" src="/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="/easyui/easyui-lang-zh_CN.js"></script>
-<link rel="stylesheet" href="/easyui/themes/default/easyui.css"/>
-<link rel="stylesheet" href="/easyui/themes/icon.css"/>
+<script type="text/javascript" src="/static/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/static/easyui/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" href="/static/easyui/themes/default/easyui.css"/>
+<link rel="stylesheet" href="/static/easyui/themes/icon.css"/>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>财务报销系统</title>

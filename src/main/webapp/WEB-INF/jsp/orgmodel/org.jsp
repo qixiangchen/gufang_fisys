@@ -5,11 +5,11 @@
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<script type="text/javascript" src="/easyui/jquery.min.js"></script>
-<script type="text/javascript" src="/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="/easyui/easyui-lang-zh_CN.js"></script>
-<link rel="stylesheet" href="/easyui/themes/default/easyui.css"/>
-<link rel="stylesheet" href="/easyui/themes/icon.css"/>
+<script type="text/javascript" src="/static/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/static/easyui/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" href="/static/easyui/themes/default/easyui.css"/>
+<link rel="stylesheet" href="/static/easyui/themes/icon.css"/>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>财务报销系统</title>
@@ -72,7 +72,7 @@ function deleteorg()
 function reloadtree()
 {
 	//$('#tree').tree('loadData',[{"id":"1","text":"Root","iconCls":null,"url":null,"state":"closed","attributes":{"type":"system","isload":"false","path":"/","parentId":null}}]);
-	$.get('/orgroot',function(data)
+	$.get('/orgroot.action',function(data)
 		{
 			$('#tree').tree({
 				data: data
@@ -92,7 +92,7 @@ $(document).ready(
 				if(node.attributes.isload=='false')
 				{
 					$.ajaxSettings.async = false;
-					var url = '/orgchild?id='+node.id;
+					var url = '/orgchild.action?id='+node.id;
 					$.get(url,function(data)
 						{
 							$('#tree').tree('append', {

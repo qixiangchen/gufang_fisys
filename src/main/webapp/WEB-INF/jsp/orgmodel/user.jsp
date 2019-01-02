@@ -5,11 +5,11 @@
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<script type="text/javascript" src="/easyui/jquery.min.js"></script>
-<script type="text/javascript" src="/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="/easyui/easyui-lang-zh_CN.js"></script>
-<link rel="stylesheet" href="/easyui/themes/default/easyui.css"/>
-<link rel="stylesheet" href="/easyui/themes/icon.css"/>
+<script type="text/javascript" src="/static/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/static/easyui/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" href="/static/easyui/themes/default/easyui.css"/>
+<link rel="stylesheet" href="/static/easyui/themes/icon.css"/>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>财务报销系统</title>
@@ -25,7 +25,7 @@ function addsuborg()
 	var id = objs[0].id;
 	$('#parentId').val(id);
 	$('#frm').form('submit', {    
-	    url:'/orgsubsave',    
+	    url:'/orgsubsave.action',    
 	    onSubmit: function(){    
 	          
 	    },    
@@ -37,7 +37,7 @@ function addsuborg()
 function updatesuborg()
 {
 	$('#frm').form('submit', {    
-	    url:'/orgsave',    
+	    url:'/orgsave.action',    
 	    onSubmit: function(){    
 	          
 	    },    
@@ -61,7 +61,7 @@ function deleteorg()
 	}
 	console.log('deleteorg()='+objs.length+','+id);
 	$.ajax({
-		url:'/orgdelete?id='+id,
+		url:'/orgdelete.action?id='+id,
 		success:function(data)
 		{
 			$.messager.alert('信息',data);
@@ -72,7 +72,7 @@ function deleteorg()
 function reloadtree()
 {
 	//$('#tree').tree('loadData',[{"id":"1","text":"Root","iconCls":null,"url":null,"state":"closed","attributes":{"type":"system","isload":"false","path":"/","parentId":null}}]);
-	$.get('/orgroot',function(data)
+	$.get('/orgroot.action',function(data)
 		{
 			$('#tree').tree({
 				data: data
@@ -83,7 +83,7 @@ function reloadtree()
 function loaddatagrid(orgId)
 {
 	$('#userdg').datagrid({
-		url:'/userload?orgId='+orgId
+		url:'/userload.action?orgId='+orgId
 	})
 }
 function chkpwd()
@@ -113,7 +113,7 @@ function saveuser()
 	{
 		orgId = $('#orgId').combobox('getValue');
 		$('#frm').form('submit', {    
-		    url:'/usersave',    
+		    url:'/usersave.action',    
 		    onSubmit: function(){    
 	  
 		    },    
@@ -161,7 +161,7 @@ $(document).ready(
 					if(node.attributes.isload=='false')
 					{
 						$.ajaxSettings.async = false;
-						var url = '/orgchild?id='+node.id;
+						var url = '/orgchild.action?id='+node.id;
 						$.get(url,function(data)
 							{
 								$('#tree').tree('append', {
@@ -186,7 +186,8 @@ $(document).ready(
 			$('#win').window('close');
 			$('#userdg').datagrid({'onClickRow':openuser})
 		}
-	);		
+	);
+
 </script>
 </head>
 <body class="easyui-layout">
@@ -196,11 +197,11 @@ $(document).ready(
     </div>
     <div data-options="region:'center',title:'用户维护'" style="padding:5px;">
 		<table id="userdg" class="easyui-datagrid" style="width:100%;height:250px"   
-		        data-options="url:'/userload',fitColumns:true,pagination:true,
+		        data-options="url:'/userload.action',fitColumns:true,pagination:true,
 		        pageSize:10,pageList:[10,50,100,200],toolbar:'#tb'">   
 		    <thead>   
 		        <tr>
-		        	<th data-options="field:'id',width:100,hidden:true">ID</th>   
+		        	<th data-options="field:'id',width:100,checkbox:true">ID</th>   
 		            <th data-options="field:'loginId',width:100">登录ID</th>   
 		            <th data-options="field:'name',width:100">姓名</th>   
 		            <th data-options="field:'address',width:100">地址</th>
@@ -286,7 +287,7 @@ $(document).ready(
 					    </div>
 					    <div style="margin-left:50px;margin-top:10px">   
 							<select id="orgId" name="orgId" class="easyui-combobox" 
-								data-options="width:250,label:'所在部门:',valueField:'id',textField:'name',url:'/orgload'" >     
+								data-options="width:250,label:'所在部门:',valueField:'id',textField:'name',url:'/orgload.action'" >     
 							</select>  
 					    </div>
 			  		    <div style="margin-left:50px;margin-top:30px"> 

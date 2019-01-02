@@ -1,0 +1,60 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{
+	margin:0 auto;
+	padding:0;	
+	font-family:'Microsoft YaHei', arial, tahoma, \5b8b\4f53, sans-serif;
+	font-size: 14px;
+}
+a {
+	text-decoration:none;
+	color:black;
+}
+div{
+	margin:0 auto;
+}
+#pagediv{
+	margin:0 auto;
+	text-align:center;
+	valign:middle;
+	background-color: yellow;
+	height:30px;
+	line-height: 30px;
+	border:1px solid black
+}
+
+table {
+	width:100%;
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table tr:nth-child(odd) td{
+	background: #ccc;
+}
+table tr:hover td{
+	background: pink;
+
+}
+table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: yellow;
+}
+table th {
+	font-size:15px;
+	color:blue;
+}
+table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
