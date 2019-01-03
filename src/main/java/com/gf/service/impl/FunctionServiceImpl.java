@@ -112,41 +112,13 @@ public class FunctionServiceImpl implements FunctionService{
 				recurseFunction(userId,id,sb2);
 				sb2.append("</div>\r\n");
 			}
-			sb.append("<a class=\"easyui-linkbutton\" style=\"background:#B3DFDA;\" data-options=\"plain:true\" onclick=\"logout()\">退出系统</a>\r\n");
+			sb.append("<a class=\"easyui-linkbutton\" style=\"background:#B3DFDA;\" data-options=\"plain:true,iconCls:'pic_25'\" onclick=\"logout()\">退出系统</a>\r\n");
 			sb.append("</div>\r\n");
 			String menu = sb.toString()+sb2.toString();
 			return menu;
 		}
 		return "";
 	}
-	
-//	@Override
-//	public void recurseFunction(String id, StringBuffer sb) {
-//		List<FunctionInfo> child = getMenu(id);
-//		if(child != null && child.size()>0)
-//		{
-//			sb.append("<div>\r\n");
-//			for(FunctionInfo fi:child)
-//			{
-//				List<FunctionInfo> child2 = getMenu(fi.getId());
-//				if(child2 != null && child2.size()>0)
-//				{
-//					sb.append("<span>"+fi.getName()+"</span>\r\n");
-//					sb.append("<div>\r\n");
-//					recurseFunction(fi.getId(),sb);
-//					sb.append("</div>\r\n");
-//				}
-//				else
-//				{
-//					sb.append(fi.getName()+"\r\n");
-//				}
-//			}
-//			
-//			sb.append("</div>\r\n");
-//		}
-//
-//
-//	}
 
 
 }

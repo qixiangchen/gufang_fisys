@@ -6,11 +6,14 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.gf.model.FunctionInfo;
 import com.gf.statusflow.def.DefWorkItem;
 import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Perm2RoleInfo;
+import com.gf.statusflow.def.PermissionInfo;
 
 @Mapper
 public interface WorkflowMapper {
@@ -60,7 +63,35 @@ public interface WorkflowMapper {
 	public void deleteOrgUserRoleById(@Param("id") String id);
 	public List<DefaultOrgUserRole> getOrgUserRoleByRoleIdEntityId(@Param("roleId") String roleId,
 		@Param("entityId") String entityId);
-	/**]
+	
+	/**
+	 * Shiro权限相关Mybatis方法
+	 */
+	public void savePermission(PermissionInfo permission);
+	public void updatePermission(PermissionInfo permission);
+	public void deletePermById(@Param("id") String id);
+	public void deletePermByModule(@Param("moduleName") String id);
+	public List<PermissionInfo> getPermission();
+	
+	/**
+	 * 角色与权限中间表Mybatis方法
+	 */
+	public void savePerm2Role(Perm2RoleInfo p2r);
+	public void deletePerm2RoleById(@Param("id") String id);
+	public void deletePerm2RoleByRoleId(@Param("roleId") String roleId);
+	public List<String> getPermByRoleId(@Param("roleId") String roleId);
+	
+	/**
+	 * 功能模块相关Mybatis方法
+	 */
+	public FunctionInfo getRootFunc();
+	public FunctionInfo getFuncById(@Param("id") String id);
+	public List<FunctionInfo> getChildFunc(@Param("id") String id);
+	public void saveFunc(FunctionInfo fi);
+	public void updateFunc(FunctionInfo fi);
+	public void deleteFunc(@Param("id") String id);
+	
+	/**
 	 * 工作流相关Mybatis方法
 	 * @param dwi
 	 */

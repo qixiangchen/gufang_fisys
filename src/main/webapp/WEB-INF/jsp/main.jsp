@@ -10,6 +10,7 @@
 <script type="text/javascript" src="/static/easyui/easyui-lang-zh_CN.js"></script>
 <link rel="stylesheet" href="/static/easyui/themes/default/easyui.css"/>
 <link rel="stylesheet" href="/static/easyui/themes/icon.css"/>
+<link rel="stylesheet" href="/static/easyui/myicon.css"/>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>财务报销系统</title>

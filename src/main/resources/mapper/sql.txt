@@ -98,3 +98,23 @@ create table gf_orguserrole(id varchar(32),
 	entitytype varchar(10),
 	roleid varchar(32),
 	flag varchar(50));
+	
+create table gf_permission(id varchar(32),
+	modulename varchar(100),
+	name varchar(100),
+	permission varchar(100));
+	
+create table gf_perm2role(id varchar(32),
+	permid varchar(32),
+	roleid varchar(32));
+	
+insert into gf_permission(id,modulename,name,permission)
+	values('1','组织机构（部门）','部门页面','url:org.action');
+insert into gf_permission(id,modulename,name,permission)
+	values('2','组织机构（部门）','加载根部门','url:orgroot.action');
+insert into gf_permission(id,modulename,name,permission)
+	values('3','组织机构（部门）','加载下一级部门','url:orgchild.action');
+	
+insert into gf_perm2role(id,permid,roleid) values('role1','1','role5263d75084e7');
+insert into gf_perm2role(id,permid,roleid) values('role2','2','role5263d75084e7');
+insert into gf_perm2role(id,permid,roleid) values('role3','3','role5263d75084e7');

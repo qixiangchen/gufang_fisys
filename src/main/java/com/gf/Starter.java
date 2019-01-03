@@ -8,6 +8,8 @@ public class Starter
 {
     public static void main( String[] args )
     {
-        SpringApplication.run(Starter.class,args);
+    	SpringApplication springApplication = new SpringApplication(Starter.class);
+    	springApplication.addListeners(new ApplicationStartup());
+    	springApplication.run(args);
     }
 }

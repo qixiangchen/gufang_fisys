@@ -3,6 +3,7 @@ package com.gf.acl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -27,6 +28,7 @@ public class ShiroConfiguration {
     {
     	DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(gfShiroRealm());
+        
         return securityManager;
     }
 
@@ -68,4 +70,5 @@ public class ShiroConfiguration {
 		HandlerExceptionResolver handlerExceptionResolver=new ShiroExceptionResolver();
 		return handlerExceptionResolver;
 	}
+    
 }

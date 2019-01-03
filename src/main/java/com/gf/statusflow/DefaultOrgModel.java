@@ -6,19 +6,39 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.gf.model.FunctionInfo;
 import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Perm2RoleInfo;
+import com.gf.statusflow.def.PermissionInfo;
 
 @Component
 public class DefaultOrgModel implements IOrgModel{
 	private Logger log = LoggerFactory.getLogger(DefaultOrgModel.class);
-	
 	@Autowired
 	private WorkflowMapper mapper;
+	@Value("${orgmodel.sysadmin.pwd}")
+	private String sysAdminPwd = null;
+	
+	public void initDb()
+	{
+		DefaultUser sysUser = mapper.getUserByLoginId(I_SYSADMIN);
+		if(sysUser == null)
+		{
+			sysUser = new DefaultUser();
+			sysUser.setId("1");
+			sysUser.setLoginId(I_SYSADMIN);
+			sysUser.setPassword(Util.getMD5(sysAdminPwd));
+			sysUser.setName("系统管理员");
+			mapper.saveUser(sysUser);
+		}
+		
+	}
 	
 	@Override
 	public List<DefaultOrg> getAllOrg()
@@ -392,6 +412,336 @@ public class DefaultOrgModel implements IOrgModel{
 		try
 		{
 			return mapper.getUserRoleList(userId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * Shiro权限相关Mybatis方法
+	 */
+	public void savePermission(PermissionInfo permission)
+	{
+		try
+		{
+			mapper.savePermission(permission);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void updatePermission(PermissionInfo permission)
+	{
+		try
+		{
+			mapper.updatePermission(permission);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deletePermById(String id)
+	{
+		try
+		{
+			mapper.deletePermById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deletePermByModule(String module)
+	{
+		try
+		{
+			mapper.deletePermByModule(module);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public List<PermissionInfo> getPermission()
+	{
+		try
+		{
+			return mapper.getPermission();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 角色与权限中间表Mybatis方法
+	 */
+	public void savePerm2Role(Perm2RoleInfo p2r)
+	{
+		try
+		{
+			mapper.savePerm2Role(p2r);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deletePerm2RoleById(String id)
+	{
+		try
+		{
+			mapper.deletePerm2RoleById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deletePerm2RoleByRoleId(String roleId)
+	{
+		try
+		{
+			mapper.deletePerm2RoleByRoleId(roleId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public List<String> getPermByRoleId(String roleId)
+	{
+		try
+		{
+			return mapper.getPermByRoleId(roleId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 功能管理模块
+	 * @return
+	 */
+	public FunctionInfo getRootFunc()
+	{
+		try
+		{
+			return mapper.getRootFunc();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 根据功能模块ID获取此功能下一级模块列表
+	 * @param id
+	 * @return
+	 */
+	public List<FunctionInfo> getChildFunc(String id)
+	{
+		try
+		{
+			return mapper.getChildFunc(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 功能模块保存方法
+	 * @param fi
+	 */
+	public void saveFunc(FunctionInfo fi)
+	{
+		try
+		{
+			mapper.saveFunc(fi);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	/**
+	 * 功能模块更新方法
+	 * @param fi
+	 */
+	public void updateFunc(FunctionInfo fi)
+	{
+		try
+		{
+			mapper.updateFunc(fi);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	/**
+	 * 初始化系统功能模块，包括(系统管理，用户管理，部门管理等模块)
+	 * @return
+	 */
+	public FunctionInfo initFunc()
+	{
+		String rootId = "root";
+		FunctionInfo root = getFuncById(rootId);
+		if(root == null)
+		{
+			root = new FunctionInfo();
+			root.setId(rootId);
+			root.setName("功能模块");
+			root.setParentId(null);
+			this.saveFunc(root);
+		}
+		String sysId = "system";
+		FunctionInfo sys = getFuncById(sysId);
+		if(sys == null)
+		{
+			sys = new FunctionInfo();
+			sys.setId(sysId);
+			sys.setName("系统管理");
+			sys.setIcon("pic_1");
+			sys.setParentId(root.getId());
+			sys.setPriority(1);
+			this.saveFunc(sys);
+		}
+		String functionId = "function";
+		FunctionInfo funmgr = getFuncById(functionId);
+		if(funmgr == null)
+		{
+			funmgr = new FunctionInfo();
+			funmgr.setId(functionId);
+			funmgr.setName("功能管理");
+			funmgr.setIcon("pic_2");
+			funmgr.setParentId(sys.getId());
+			funmgr.setUrl("/function.action");
+			funmgr.setPriority(1);
+			this.saveFunc(funmgr);
+		}
+		String orgmodelId = "orgmodel";
+		FunctionInfo orgmodel = getFuncById(orgmodelId);
+		if(orgmodel == null)
+		{
+			orgmodel = new FunctionInfo();
+			orgmodel.setId(orgmodelId);
+			orgmodel.setName("组织机构");
+			orgmodel.setIcon("pic_3");
+			orgmodel.setParentId(sys.getId());
+			orgmodel.setPriority(2);
+			this.saveFunc(orgmodel);
+		}
+		String orgId = "orgmodel_org";
+		FunctionInfo org = getFuncById(orgId);
+		if(org == null)
+		{
+			org = new FunctionInfo();
+			org.setId(orgId);
+			org.setName("部门管理");
+			org.setIcon("pic_4");
+			org.setParentId(orgmodel.getId());
+			org.setUrl("/org.action");
+			org.setPriority(2);
+			this.saveFunc(org);
+		}
+		String userId = "orgmodel_user";
+		FunctionInfo user = getFuncById(userId);
+		if(user == null)
+		{
+			user = new FunctionInfo();
+			user.setId(userId);
+			user.setName("用户管理");
+			user.setIcon("pic_5");
+			user.setParentId(orgmodel.getId());
+			user.setUrl("/user.action");
+			user.setPriority(2);
+			this.saveFunc(user);
+		}
+		String roleId = "orgmodel_role";
+		FunctionInfo role = getFuncById(roleId);
+		if(role == null)
+		{
+			role = new FunctionInfo();
+			role.setId(roleId);
+			role.setName("角色管理");
+			role.setIcon("pic_5");
+			role.setParentId(orgmodel.getId());
+			role.setUrl("/role.action");
+			role.setPriority(2);
+			this.saveFunc(role);
+		}
+		String userroleId = "orgmodel_userrole";
+		FunctionInfo userrole = getFuncById(userroleId);
+		if(userrole == null)
+		{
+			userrole = new FunctionInfo();
+			userrole.setId(userroleId);
+			userrole.setName("角色分配");
+			userrole.setIcon("pic_6");
+			userrole.setParentId(orgmodel.getId());
+			userrole.setUrl("/roleuser.action");
+			userrole.setPriority(2);
+			this.saveFunc(userrole);
+		}
+		String moduleId = "module";
+		FunctionInfo module = getFuncById(moduleId);
+		if(module == null)
+		{
+			module = new FunctionInfo();
+			module.setId(moduleId);
+			module.setName("模块权限");
+			module.setIcon("pic_11");
+			module.setParentId(sys.getId());
+			module.setUrl("/module.action");
+			module.setPriority(3);
+			this.saveFunc(module);
+		}
+		return root;
+	}
+	/**
+	 * 根据模块ID删除此模块，系统功能模块不可删除
+	 * @param id
+	 */
+	public void deleteFunc(String id)
+	{
+		try
+		{
+			mapper.deleteFunc(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public FunctionInfo getFuncById(String id)
+	{
+		try
+		{
+			return mapper.getFuncById(id);
 		}
 		catch(Exception e)
 		{

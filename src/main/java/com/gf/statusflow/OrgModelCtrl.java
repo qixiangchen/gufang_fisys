@@ -22,6 +22,7 @@ import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.PermissionInfo;
 import com.gf.statusflow.def.TreeNode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -32,6 +33,7 @@ public class OrgModelCtrl {
 	@Autowired
 	private IOrgModel orgmodel;
 
+	//部门页面
 	@RequiresPermissions("url:org.action")
 	@RequestMapping("/org.action")
 	public String org()
@@ -39,6 +41,7 @@ public class OrgModelCtrl {
 		return "/orgmodel/org";
 	}
 	
+	//加载根部门
 	@RequiresPermissions("url:orgroot.action")
 	@RequestMapping("/orgroot.action")
 	@ResponseBody
@@ -51,6 +54,7 @@ public class OrgModelCtrl {
 		return roots;
 	}
 	
+	//加载下一级部门
 	@RequiresPermissions("url:orgchild.action")
 	@RequestMapping("/orgchild.action")
 	@ResponseBody
@@ -134,6 +138,7 @@ public class OrgModelCtrl {
 		return tn;
 	}
 	
+	@RequiresPermissions("url:user.action")
 	@RequestMapping("/user.action")
 	public String user()
 	{
@@ -165,6 +170,7 @@ public class OrgModelCtrl {
 		return m;
 	}
 	
+	@RequiresPermissions("url:userquery.action")
 	@RequestMapping("/userquery.action")
 	@ResponseBody
 	public Map userquery(Integer page,Integer rows,String qname)
@@ -365,5 +371,55 @@ public class OrgModelCtrl {
 		}
 		else
 			return false;
+	}
+	
+	@RequestMapping("/module.action")
+	public String module()
+	{
+		return "/orgmodel/module";
+	}
+	
+	@RequestMapping("/moduleload.action")
+	@ResponseBody
+	public Map loadmodule(Integer page,Integer rows)
+	{
+		PageHelper.startPage(page, rows);
+		List<PermissionInfo> lists = orgmodel.getPermission();
+		PageInfo pi = new PageInfo(lists);
+		Long total = pi.getTotal();
+		List<PermissionInfo> perms = pi.getList();
+		Map m = new HashMap();
+		m.put("total", total);
+		m.put("rows", perms);
+		return m;
+	}
+	
+	@RequestMapping("/modulesave.action")
+	@ResponseBody
+	public Boolean modulesave(PermissionInfo perm)
+	{
+		String id = perm.getId();
+		if("".equals(Util.fmtStr(id)))
+		{
+			perm.setId(UUID.create("perm"));
+			orgmodel.savePermission(perm);
+		}
+		else
+			orgmodel.updatePermission(perm);
+		return true;
+	}
+	
+	@RequestMapping("/moduledelete.action")
+	@ResponseBody
+	public Boolean moduledelete(String[] id)
+	{
+		if(id != null)
+		{
+			for(String id2:id)
+			{
+				orgmodel.deletePermById(id2);
+			}
+		}
+		return true;
 	}
 }

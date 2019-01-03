@@ -19,6 +19,7 @@ import com.gf.statusflow.IOrgUserRole;
 import com.gf.statusflow.IRole;
 import com.gf.statusflow.IUser;
 import com.gf.statusflow.def.DefaultOrgUserRole;
+import com.gf.statusflow.def.PermissionInfo;
 
 public class GfShiroRealm extends AuthorizingRealm{
 	private Logger log = LoggerFactory.getLogger(GfShiroRealm.class);
@@ -35,27 +36,27 @@ public class GfShiroRealm extends AuthorizingRealm{
 		//查询用户名称
 		IUser user = orgmodel.getUserByLoginId(loginId);
 		
+		
 		SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
 		//判断是否为超级管理员
-//		if(IConstants.I_SYSTEM_USERID.equals(user.getId()))
-//		{
-//			for (Permission perm:orgmodel.getAdminPerm()) {
-//				//添加权限
-//				simpleAuthorizationInfo.addStringPermission(perm.getPermission());
-//			}
-//		}
-//		else
+		if(IOrgModel.I_SYSADMIN.equals(loginId))
+		{
+			for (PermissionInfo perm:orgmodel.getPermission()) {
+				//添加权限
+				simpleAuthorizationInfo.addStringPermission(perm.getPermission());
+			}
+		}
+		else//普通用户获取权限列表
 		{
 			//添加角色和权限
 			//部门与角色，用户与角色关系表对应实体类IOrgUserRole
 			List<DefaultOrgUserRole> roles = orgmodel.getOrgUserRoleByEntityId(user.getId());
-			System.out.println("##############################doGetAuthorizationInfo roles==="+roles);
-			for (DefaultOrgUserRole role:roles) {
-				System.out.println("##############################roleid==="+role.getRoleId());
-				//for (Permission perm:orgmodel.getPermByRoleId(role.getRoleId())) {
+			for(DefaultOrgUserRole dour:roles)
+			{
+				for (String perm:orgmodel.getPermByRoleId(dour.getRoleId())) {
 					//添加权限
-				//	simpleAuthorizationInfo.addStringPermission(perm.getPermission());
-				//}
+					simpleAuthorizationInfo.addStringPermission(perm);
+				}
 			}
 		}
 		return simpleAuthorizationInfo;

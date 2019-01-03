@@ -295,4 +295,63 @@
 	<select id="getUserRoleList" resultType="Map">
 		select our.id,u.name,u.id userId,r.name roleName from gf_user u,gf_orguserrole our,gf_role r where u.id=our.entityid and our.roleid=r.id and our.entityid=#{userId}
 	</select>
+	
+	<!-- 权限表操作 -->
+	<insert id="savePermission" parameterType="com.gf.statusflow.def.PermissionInfo">
+		insert into gf_permission(id,modulename,name,permission)
+			values(#{id},#{moduleName},#{name},#{permission})
+	</insert>
+	<update id="updatePermission" parameterType="com.gf.statusflow.def.PermissionInfo">
+		update gf_permission set modulename=#{moduleName},name=#{name},permission=#{permission}
+			where id=#{id}
+	</update>
+	<delete id="deletePermById" parameterType="String">
+		delete from gf_permission where id=#{id}
+	</delete>
+	<delete id="deletePermByModule" parameterType="String">
+		delete from gf_permission where modulename=#{moduleName}
+	</delete>
+	<select id="getPermission" resultType="com.gf.statusflow.def.PermissionInfo">
+		select * from gf_permission
+	</select>
+	
+	<!-- 权限与角色中间表 -->
+	<insert id="savePerm2Role" parameterType="com.gf.statusflow.def.Perm2RoleInfo">
+		insert into gf_perm2role(id,permid,roleid)
+			values(#{id},#{permId},#{roleId})
+	</insert>
+	<delete id="deletePerm2RoleById" parameterType="String">
+		delete from gf_perm2role where id=#{id}
+	</delete>
+	<delete id="deletePerm2RoleByRoleId" parameterType="String">
+		delete from gf_perm2role where roleid=#{roleId}
+	</delete>
+	<select id="getPermByRoleId" resultType="String">
+		select p.permission from gf_perm2role p2r,gf_permission p 
+			where p2r.permid=p.id and p2r.roleid=#{roleId}
+	</select>
+	
+	<!-- 功能模块 -->
+	<select id="getRootFunc" resultType="com.gf.model.FunctionInfo">
+		select * from gf_function where parentid is null
+	</select>
+	<select id="getFuncById" resultType="com.gf.model.FunctionInfo">
+		select * from gf_function where id=#{id}
+	</select>
+	<select id="getChildFunc" resultType="com.gf.model.FunctionInfo">
+		select * from gf_function where parentid=#{id} order by priority
+	</select>
+	<insert id="saveFunc" parameterType="com.gf.model.FunctionInfo"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into gf_function(id,name,url,icon,priority,parentid)
+		values(#{id},#{name},#{url},#{icon},#{priority},#{parentId})
+	</insert>
+	<update id="updateFunc" parameterType="com.gf.model.FunctionInfo">
+		update gf_function set name=#{name},url=#{url},icon=#{icon},priority=#{priority},
+			parentid=#{parentId}
+		where id=#{id}
+	</update>
+	<delete id="deleteFunc" parameterType="Integer">
+		delete from gf_function where id=#{id}
+	</delete>
 </mapper>
