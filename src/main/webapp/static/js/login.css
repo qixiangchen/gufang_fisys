@@ -1,0 +1,71 @@
+body{
+	font-size:12px;
+	font-family:Verdana, Geneva, sans-serif;
+	line-height:23px;/* 设置行高度为23px*/
+	margin:0;/* 上下左右边界大小为0*/
+	padding:0;/* 上下左右填充大小为0*/
+	background:url(/static/images/login_bg.jpg);
+	color:#3b6e81;
+	}
+/* 登录窗口样式定义*/
+.login_panel{
+	margin:0 auto;
+	width:330px;/* 登录窗口宽度*/
+	height:243px;
+	margin-top:10%;/* 上边界为窗口10%宽度*/
+	padding-left:300px;/* 左边填充300px*/
+	padding-top:110px;/* 上边填充110px*/
+	background:url(/static/images/login_panel.png) no-repeat;/* 底图不重复平铺*/
+    position:relative;/* 与父空间相对位置显示*/
+	}
+
+.sysname-zh
+{
+    position:absolute;/* 与父空间绝对位置显示*/
+    top:50px;/* 上边界50px*/
+    left:320px;/* 左边界320px*/
+    font-size:26px;
+    font-weight:900;
+    color:#0074a6;
+}
+
+.sysname-en
+{
+    position:absolute;/* 与父空间绝对位置显示*/
+    top:70px;
+    left:312px;
+    color:#9aa5a9;
+}
+
+ .message
+{   
+    position:absolute;
+    bottom:80px;
+    left:312px;
+    color:red;
+}
+
+.logo
+{
+     position:absolute;
+     left:50px;
+     top:80px;
+}
+
+.login{
+	width:200px;
+	border:1px solid #7fb5c1;/* 边框实线显示,颜色#7fb5c1*/
+	height:22px;
+	vertical-align:text-bottom;/* 文本下对齐*/
+}
+
+.botton{
+	width:58px;
+	height:26px;
+    line-height:26px;
+	border:none;
+	color:#FFF;
+	font-weight:bold;
+	margin-left:15px;
+	background:url(/static/images/reset.jpg);
+}

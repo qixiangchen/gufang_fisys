@@ -1,0 +1,120 @@
+create database gf_fisys character set utf8;
+use gf_fisys;
+
+create table gf_function(id varchar(40),name varchar(100),
+	url varchar(100),priority int,icon varchar(50),parentid varchar(40));
+	
+insert into gf_function(id,name,url,priority,icon,parentid)
+	values('root','功能树','',0,'',null);
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('sysadmin','系统管理','',1,'','root');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('corp','协同办公','',2,'','root');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('org','组织管理','',1,'','sysadmin');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('dept','部门管理','/org.action',0,'','org');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('user','用户管理','/user.action',1,'','org');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('role','角色管理','/role.action',2,'','org');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('roleuser','角色授权','/roleuser.action',3,'','org');
+insert into  gf_function(id,name,url,priority,icon,parentid)
+	values('permission','权限分配','',2,'','sysadmin');
+	
+工作流待办件数据库表
+
+CREATE TABLE `wf_statusworkitem` (
+  `id` varchar(32) NOT NULL,
+  `createtime` datetime NOT NULL,
+  `finishtime` datetime DEFAULT NULL,
+  `flag` varchar(255) DEFAULT NULL,
+  `instactivityid` varchar(255) DEFAULT NULL,
+  `instprocessid` varchar(255) DEFAULT NULL,
+  `instanceid` varchar(255) NOT NULL,
+  `processid` varchar(255) DEFAULT NULL,
+  `processname` varchar(255) DEFAULT NULL,
+  `startuserid` varchar(255) DEFAULT NULL,
+  `statusid` varchar(255) DEFAULT NULL,
+  `statusname` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `url` varchar(255) NOT NULL,
+  `userid` varchar(255) DEFAULT NULL,
+  `xmldata` longtext,
+  `flag2` varchar(255) DEFAULT NULL,
+  `testmode` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+);
+
+create table gf_org(id varchar(32),
+	name varchar(100),
+	parentid varchar(32),
+	orgpath varchar(500),
+	fullname varchar(500),
+	seqno int,
+	flag varchar(20));
+	
+insert into gf_org(id,name,parentid,orgpath,fullname,seqno,flag)
+	values('root','集团公司',null,'/root','/集团公司',1,'gf');
+insert into gf_org(id,name,parentid,orgpath,fullname,seqno,flag)
+	values('1','古方红糖','root','/root/1','/集团公司/古方红糖',1,'gf');
+	
+create table gf_user(id varchar(32),
+	loginid varchar(100),
+	password varchar(32),
+	name varchar(100),
+	address varchar(200),
+	companymail varchar(100),
+	privatemail varchar(100),
+	companyteleno varchar(100),
+	hometeleno varchar(100),
+	mobile varchar(100),
+	title varchar(32),
+	description varchar(200),
+	orgid varchar(32),
+	orgpath varchar(200),
+	enabled int,
+	locked varchar(20),
+	managerid varchar(32),
+	birthday date,
+	cardid varchar(20),
+	failuredate datetime,
+	failurecount int,
+	openid varchar(50),
+	seqno int,
+	flag varchar(50),
+	testmode varchar(10)
+);
+
+create table gf_role(id varchar(32),
+	name varchar(100),
+	description varchar(200),
+	flag varchar(50));
+create table gf_orguserrole(id varchar(32),
+	entityid varchar(32),
+	entitytype varchar(10),
+	roleid varchar(32),
+	flag varchar(50));
+	
+create table gf_permission(id varchar(32),
+	modulename varchar(100),
+	name varchar(100),
+	permission varchar(100));
+	
+create table gf_perm2role(id varchar(32),
+	permid varchar(32),
+	roleid varchar(32));
+	
+insert into gf_permission(id,modulename,name,permission)
+	values('1','组织机构（部门）','部门页面','url:org.action');
+insert into gf_permission(id,modulename,name,permission)
+	values('2','组织机构（部门）','加载根部门','url:orgroot.action');
+insert into gf_permission(id,modulename,name,permission)
+	values('3','组织机构（部门）','加载下一级部门','url:orgchild.action');
+	
+insert into gf_perm2role(id,permid,roleid) values('role1','1','role5263d75084e7');
+insert into gf_perm2role(id,permid,roleid) values('role2','2','role5263d75084e7');
+insert into gf_perm2role(id,permid,roleid) values('role3','3','role5263d75084e7');
