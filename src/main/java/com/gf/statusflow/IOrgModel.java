@@ -10,11 +10,13 @@ import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Menu2RoleInfo;
 import com.gf.statusflow.def.Perm2RoleInfo;
 import com.gf.statusflow.def.PermissionInfo;
 
 public interface IOrgModel
 {
+	public String I_SYSADMIN_ID = "1";
 	public String I_SYSADMIN = "sysadmin";
 	
 	public void initDb();
@@ -71,8 +73,10 @@ public interface IOrgModel
 	public void savePermission(PermissionInfo permission);
 	public void updatePermission(PermissionInfo permission);
 	public void deletePermById(String id);
-	public void deletePermByModule(String id);
-	public List<PermissionInfo> getPermission();
+	public void deletePermByFuncId(String id);
+	public List<PermissionInfo> getPermissionByFuncId(String id);
+	public List<PermissionInfo> getPermission(String permId,
+			String funcId,String roleId);
 	
 	/**
 	 * 角色与权限中间表Mybatis方法
@@ -98,32 +102,27 @@ public interface IOrgModel
 	 * 功能管理模块
 	 * @return
 	 */
+	public List<FunctionInfo> getAllFunc();
 	public FunctionInfo getRootFunc();
-	/**
-	 * 根据功能模块ID获取此功能下一级模块列表
-	 * @param id
-	 * @return
-	 */
 	public List<FunctionInfo> getChildFunc(String id);
-	/**
-	 * 功能模块保存方法
-	 * @param fi
-	 */
+	public List<FunctionInfo> getListByPath(String path);
 	public void saveFunc(FunctionInfo fi);
-	/**
-	 * 功能模块更新方法
-	 * @param fi
-	 */
 	public void updateFunc(FunctionInfo fi);
-	/**
-	 * 初始化系统功能模块，包括(系统管理，用户管理，部门管理等模块)
-	 * @return
-	 */
 	public FunctionInfo initFunc();
-	/**
-	 * 根据模块ID删除此模块，系统功能模块不可删除
-	 * @param id
-	 */
 	public void deleteFunc(String id);
 	public FunctionInfo getFuncById(String id);
+	
+	/**
+	 * 菜单角色相关Mybatis方法
+	 */
+	public void saveMenuRole(Menu2RoleInfo m2r);
+	public void updateMenuRole(Menu2RoleInfo m2r);
+	public void deleteMenuRoleById(String id);
+	public void deleteMenuRoleByRoleId(String roleId);
+	public void deleteMenuRoleByFuncId(String funcId);
+	public Menu2RoleInfo getMenuRoleById(String id);
+	public List<Menu2RoleInfo> getMenuRoleByRoleId(String roleId);
+	public List<Menu2RoleInfo> getMenuRoleByFuncId(String funcId);
+	public List<FunctionInfo> getFuncListByUserId(String userId);
+	public List<Menu2RoleInfo> getAclMenu(String funcId,String roleId);
 }

@@ -1,192 +1,190 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-
+<%
+String webCtx = request.getContextPath();
+%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<script type="text/javascript" src="/static/easyui/jquery.min.js"></script>
-<script type="text/javascript" src="/static/easyui/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="/static/easyui/easyui-lang-zh_CN.js"></script>
-<link rel="stylesheet" href="/static/easyui/themes/default/easyui.css"/>
-<link rel="stylesheet" href="/static/easyui/themes/icon.css"/>
-<head>
+<script type="text/javascript" src="<%=webCtx %>/static/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="<%=webCtx %>/static/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=webCtx %>/static/easyui/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" href="<%=webCtx %>/static/easyui/themes/default/easyui.css"/>
+<link rel="stylesheet" href="<%=webCtx %>/static/easyui/themes/icon.css"/>
+<link rel="stylesheet" href="<%=webCtx %>/static/easyui/myicon.css"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>财务报销系统</title>
-<script>
 
-function addperm()
-{
-	$('#win').window('open');
-}
-function closeperm()
-{
-	$('#win').window('close');
-}
-function saveperm()
-{
-	var rtn = $('#frm').form('validate');
-	if(rtn)
+<script>
+	function reloadtree()
 	{
-		$('#frm').form('submit', {    
-		    url:'/modulesave.action',    
-		    onSubmit: function(){    
-	  
-		    },    
-		    success:function(data){    
-		    	$('#permdg').datagrid('reload');
-		    	closeperm();
-		    }    
-		});
+		$.get('/modulefuncroot.action',function(data)
+			{
+				$('#tree').tree({
+					data: data
+				});
+			}
+		)
 	}
-}
-function deleteperm()
-{
-	var objs = $('#permdg').datagrid('getChecked');
-	var id = '';
-	for(i=0;i<objs.length;i++)
-		id = id + objs[i].id+ ',';
-	$.ajax({
-		url:'/moduledelete.action?id='+id,
-		success:function(data)
+	function addperm()
+	{
+		$('#id').val('');
+		$('#funcId').val('');
+
+		var nodes = $('#tree').tree('getChecked');
+		if(nodes.length != 1)
 		{
-			$('#permdg').datagrid('reload');
+			$.messager.alert('提示','请选择唯一功能模块');
+			return;
 		}
-	})
-}
-function selrole()
-{
-	var permObj = $('#permdg').datagrid('getChecked');
-	if(permObj.length == 0)
-	{
-		$.messager.alert('提示','请选择权限');
-		return;
-	}
-	$('#rolewin').window('open');
-}
-function savepermrole()
-{
-	var permObj = $('#permdg').datagrid('getChecked');
-	var roleObj = $('#roledg').datagrid('getChecked');
-	if(permObj.length == 0)
-	{
-		$.messager.alert('提示','请选择权限');
-		return;
-	}
-	if(roleObj.length == 0)
-	{
-		$.messager.alert('提示','请选择角色');
-		return;
-	}
-	var permId = '';
-	for(var i=0;i<permObj.length;i++)
-	{
-		permId = permId + permObj[i].id + ',';
-	}
-	var roleId = '';
-	for(var i=0;i<roleObj.length;i++)
-	{
-		roleId = roleId + roleObj[i].id + ',';
-	}
-	$.ajax({
-		url:'/modulerolesave.action?permId='+permId+"&roleId="+roleId,
-		success:function(data)
+		for(var i=0;i<nodes.length;i++)
 		{
-			$('#rolewin').window('close');
-			$('#permdg').datagrid('reload');
+			funcid=nodes[i].id;
 		}
-	})
-}
-function openRole(index, row)
-{
-	$('#rolewin').window('open');
-	$('#roledg').datagrid('uncheckAll');
-	var rowsObj = $('#roledg').datagrid('getRows');
-	for(var i=0;i<rowsObj.length;i++)
-	{
-		if((row.roleId).indexOf(rowsObj[i].id)>=0)
+		if(funcid == 'root')
 		{
-			$('#roledg').datagrid('checkRow',i);
+			$.messager.alert('提示','禁止选择根节点');
+			return;
+		}
+		if(funcid.substr(0,4) == 'perm')
+		{
+			$.messager.alert('提示','请选择唯一功能模块,不能选择权限节点');
+			return;
+		}
+
+		var rtn = $('#frm').form('validate');
+		if(rtn)
+		{
+			$('#funcId').val(funcid);
+			$('#frm').form('submit', {    
+			    url:'/modulesave.action',    
+			    onSubmit: function(){    
+		  
+			    },    
+			    success:function(data){    
+			    	reloadtree();
+			    }    
+			});
 		}
 	}
-}
-$(document).ready(
-		function()
+	function saveperm()
+	{
+		var funcid = $('#funcId').val();
+		if(funcid == null || funcid =='')
 		{
-			$('#win').window('close');
-			$('#rolewin').window('close');
-			$('#permdg').datagrid({
-				onClickRow:openRole
+			var nodes = $('#tree').tree('getChecked');
+			if(nodes.length != 1)
+			{
+				$.messager.alert('提示','请选择唯一功能模块');
+				return;
+			}
+			for(var i=0;i<nodes.length;i++)
+			{
+				funcid=nodes[i].id;
+			}
+			if(funcid == 'root')
+			{
+				$.messager.alert('提示','禁止选择根节点');
+				return;
+			}
+			if(funcid.substr(0,4) == 'perm')
+			{
+				$.messager.alert('提示','请选择唯一功能模块,不能选择权限节点');
+				return;
+			}
+		}
+		var rtn = $('#frm').form('validate');
+		if(rtn)
+		{
+			$('#funcId').val(funcid);
+			$('#frm').form('submit', {    
+			    url:'/modulesave.action',    
+			    onSubmit: function(){    
+		  
+			    },    
+			    success:function(data){    
+			    	reloadtree();
+			    }    
+			});
+		}
+	}
+	function deleteperm()
+	{
+		var nodes = $('#tree').tree('getChecked');
+		var id = '';
+		for(var i=0;i<nodes.length;i++)
+		{
+			if(nodes[i].id.substr(0,4) == 'perm')
+				id = id + nodes[i].id + ',';
+		}
+		$.ajax({
+			url:'/moduledelete.action?id='+id,
+			success:function(data)
+			{
+				reloadtree();
+			}
+		})
+	}
+	$(document).ready(function()
+		{
+			reloadtree();
+			$('#tree').tree({
+				onBeforeExpand:function(node,param)
+				{
+					if(node.attributes.isload=='false')
+					{
+						$.ajaxSettings.async = false;
+						var url = '/modulegettreebyid.action?id='+node.id;
+						$.get(url,function(data)
+							{
+								$('#tree').tree('append', {
+									parent: node.target,
+									data: data
+								});
+							}
+						)
+						$.ajaxSettings.async = true;
+						node.attributes.isload = 'true';
+					}
+				},
+				onExpand: function(node){
+
+				},
+				onClick: function(node){
+					//如果是点击末级权限节点,窗口显示信息,权限ID以perm为前缀
+					if(node.id.substr(0,4) == 'perm')
+					{
+						$('#id').val(node.id);
+						$('#name').textbox('setValue',node.text);
+						$('#funcId').val(node.attributes.funcId);
+						$('#permission').textbox('setValue',node.attributes.permission);
+					}
+				}
 			})
 		}
-	);		
+	);
 </script>
+
 </head>
 <body class="easyui-layout">
-    <div data-options="region:'center',title:'模块维护'" style="padding:5px;">
-		<table id="permdg" class="easyui-datagrid" style="width:100%;height:100%"   
-		        data-options="url:'/moduleload.action',fitColumns:true,pagination:true,
-		        pageSize:10,pageList:[10,50,100,200],toolbar:'#tb'">   
-		    <thead>   
-		        <tr>
-		        	<th data-options="field:'id',width:100,checkbox:true">ID</th>   
-		            <th data-options="field:'moduleName',width:100">模块名称</th>   
-		            <th data-options="field:'name',width:100">权限名称</th>
-		            <th data-options="field:'permission',width:100">权限代码</th>
-		            <th data-options="field:'roleName',width:100">授权角色</th>
-		            <th data-options="field:'roleId',width:100">授权角色ID</th>
-		        </tr>   
-		    </thead>   
-		</table>
-		<div id="tb">
-			<a id="btn" onclick="addperm()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加权限</a>
-			<a id="btn" onclick="deleteperm()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除权限</a>
-			<a id="btn" onclick="selrole()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">授权角色</a>
-		</div>
-
-		<div id="win" class="easyui-window" title="模块权限窗口" style="width:400px;height:280px"   
-		        data-options="iconCls:'icon-save',modal:true">   
-		    <div class="easyui-layout" data-options="fit:true">      
-		        <div data-options="region:'center'">   
-					<form id="frm" method="post">
-						<input type="hidden" id="id" name="id"/>
-					    <div style="margin-left:50px;margin-top:10px">      
-					        <input class="easyui-textbox" type="text" id="moduleName" name="moduleName" data-options="width:250,label:'模块名称:'" />   
-					    </div>
-					    <div style="margin-left:50px;margin-top:10px">    
-					        <input class="easyui-textbox" type="text" id="name" name="name" data-options="width:250,label:'权限名称:'" />
-					    </div>
-					    <div style="margin-left:50px;margin-top:10px">    
-					        <input class="easyui-textbox" type="text" id="permission" name="permission" data-options="width:250,label:'权限代码:'" />
-					    </div>
-			  		    <div style="margin-left:50px;margin-top:30px"> 
-							<a id="btn" onclick="saveperm()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">保存</a>  
-							<a id="btn" onclick="closeperm()" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">关闭</a>    
-					    </div>
-					</form>
-		        </div>   
-		    </div>   
-		</div>
-		
-		<div id="rolewin" class="easyui-window" title="选择角色窗口" style="width:400px;height:280px"   
-		        data-options="iconCls:'icon-save',modal:true">   
-		    <div class="easyui-layout" data-options="fit:true">      
-		        <div data-options="region:'center'">   
-					<table id="roledg" class="easyui-datagrid" style="width:100%;height:100%"   
-					        data-options="url:'/roleload.action',fitColumns:true,pagination:true,
-					        pageSize:10,pageList:[10,50,100,200],toolbar:'#tb2'">   
-					    <thead>   
-					        <tr>
-					        	<th data-options="field:'id',width:100,checkbox:true">ID</th>   
-					            <th data-options="field:'name',width:100">角色名称</th>   
-					            <th data-options="field:'description',width:100">角色描述</th>
-					        </tr>   
-					    </thead>   
-					</table>
-					<div id="tb2">
-						<a id="btn" onclick="savepermrole()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">保存授权</a>
-					</div>
-		        </div>   
-		    </div>   
-		</div>
-    </div>
+	<div data-options="region:'west',title:'功能模块导航'" style="width:200px;padding:0px;">
+		<ul id="tree" class="easyui-tree" data-options="checkbox:true,cascadeCheck:false,lines:true">   
+		</ul> 
+	</div>
+	<div data-options="region:'center',title:'模块权限管理'">
+		<form id="frm" method="post">
+			<input type="hidden" id="id" name="id"/>
+			<input type="hidden" id="funcId" name="funcId"/>
+		    <div style="margin-left:50px;margin-top:30px">   
+		        <input class="easyui-textbox" type="text" id="name" name="name" data-options="required:true,label:'权限名称:',width:300" />   
+		    </div>
+		    <div style="margin-left:50px;margin-top:30px"> 
+		        <input class="easyui-textbox" type="text" id="permission" name="permission" data-options="required:true,label:'权限代码:',width:300" />   
+		    </div>
+  		    <div style="margin-left:50px;margin-top:30px">
+  		    	<a id="btn" onclick="addperm()" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'">新增模块权限</a> 
+				<a id="btn" onclick="saveperm()" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存模块权限</a>  
+				<a id="btn" onclick="deleteperm()" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除模块权限</a>  
+		    </div>
+		</form>
+	</div>
 </body>
 </html>

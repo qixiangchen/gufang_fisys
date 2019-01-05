@@ -130,6 +130,8 @@ String webCtx = request.getContextPath();
 					$('#priority').textbox('setValue',node.attributes.priority);
 					$('#parentId').val(node.attributes.parentId);
 					$('#type').val(node.attributes.type);
+					$('#path').val(node.attributes.path);
+					$('#fullName').textbox('setValue',node.attributes.fullName);
 					$('#url').textbox('setValue',node.url);
 				}
 			})
@@ -147,6 +149,7 @@ String webCtx = request.getContextPath();
 		<form id="frm" method="post">
 			<input type="hidden" id="id" name="id"/>
 			<input type="hidden" id="parentId" name="parentId"/>
+			<input type="hidden" id="path" name="path"/>
 			<input type="hidden" id="type" name="type"/>
 		    <div style="margin-left:50px;margin-top:30px">   
 		        <input class="easyui-textbox" type="text" id="name" name="name" data-options="label:'部门名称:',width:300" />   
@@ -157,24 +160,14 @@ String webCtx = request.getContextPath();
 		    <div style="margin-left:50px;margin-top:30px"> 
 		        <input class="easyui-textbox" type="text" id="priority" name="priority" data-options="label:'优先级:',width:300,required:true,validType:'number'" />   
 		    </div>
-		    <div style="margin-left:50px;margin-top:30px"> 
-				<select id="icon" name="icon" data-options="label:'图标:',width:300" class="easyui-combobox" name="dept" style="width:200px;">   
-				    <option value="pic_1">pic_1</option>
-				    <option value="pic_2">pic_2</option>
-				    <option value="pic_3">pic_3</option>
-				    <option value="pic_4">pic_4</option>
-				    <option value="pic_5">pic_5</option>
-				    <option value="pic_6">pic_6</option>
-				    <option value="pic_7">pic_7</option>
-				    <option value="pic_8">pic_8</option>
-				    <option value="pic_9">pic_9</option>
-				    <option value="pic_10">pic_10</option>
-				    <option value="pic_11">pic_11</option>
-				    <option value="pic_12">pic_12</option>
-				    <option value="pic_13">pic_13</option>
-				</select>
-		    </div>
+		    <div style="margin-left:50px;margin-top:30px">
+				<input id="cc" class="easyui-combobox" id="icon" name="icon"   
+				    data-options="label:'图标:',width:300,valueField:'id',textField:'name',url:'/funcicon.action'" /> 
 
+		    </div>
+		    <div style="margin-left:50px;margin-top:30px"> 
+		        <input class="easyui-textbox" type="text" id="fullName" name="fullName" data-options="label:'全名称:',width:300,readonly:true" />   
+		    </div>
   		    <div style="margin-left:50px;margin-top:30px"> 
 				<a id="btn" onclick="addsubfunc()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">添加子模块</a>  
 				<a id="btn" onclick="updatefunc()" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">修改模块</a>  

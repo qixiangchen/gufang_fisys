@@ -41,7 +41,7 @@ public class GfShiroRealm extends AuthorizingRealm{
 		//判断是否为超级管理员
 		if(IOrgModel.I_SYSADMIN.equals(loginId))
 		{
-			for (PermissionInfo perm:orgmodel.getPermission()) {
+			for (PermissionInfo perm:orgmodel.getPermission("","","")) {
 				//添加权限
 				simpleAuthorizationInfo.addStringPermission(perm.getPermission());
 			}

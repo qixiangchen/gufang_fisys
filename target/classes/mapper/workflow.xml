@@ -298,24 +298,27 @@
 	
 	<!-- 权限表操作 -->
 	<insert id="savePermission" parameterType="com.gf.statusflow.def.PermissionInfo">
-		insert into gf_permission(id,modulename,name,permission)
-			values(#{id},#{moduleName},#{name},#{permission})
+		insert into gf_permission(id,funcid,name,permission)
+			values(#{id},#{funcId},#{name},#{permission})
 	</insert>
 	<update id="updatePermission" parameterType="com.gf.statusflow.def.PermissionInfo">
-		update gf_permission set modulename=#{moduleName},name=#{name},permission=#{permission}
+		update gf_permission set funcid=#{funcId},name=#{name},permission=#{permission}
 			where id=#{id}
 	</update>
 	<delete id="deletePermById" parameterType="String">
 		delete from gf_permission where id=#{id}
 	</delete>
-	<delete id="deletePermByModule" parameterType="String">
-		delete from gf_permission where modulename=#{moduleName}
+	<delete id="deletePermByFuncId" parameterType="String">
+		delete from gf_permission where funcid=#{funcId}
 	</delete>
+	<select id="getPermissionByFuncId" resultType="com.gf.statusflow.def.PermissionInfo">
+		select * from gf_permission where funcid=#{funcId}
+	</select>
 	<select id="getPermission" resultType="com.gf.statusflow.def.PermissionInfo">
-		select a.*,b.roleName,b.roleId from gf_permission a left join
-		(select group_concat(r.id) roleId,group_concat(r.name) roleName,p2r.permid permid from gf_perm2role p2r,gf_role r 
-			where p2r.roleid=r.id group by p2r.permid) b
-		on a.id=b.permid
+		select p2r.id,a.name,a.permission,r.name roleName,c.name funcName from gf_permission a,gf_perm2role p2r,gf_role r,gf_function c
+		where a.funcid=c.id and a.id=p2r.permid and p2r.roleid=r.id
+			and (p2r.permid like '%${permId}%' and a.funcid like '%${funcId}%')
+			and p2r.roleid like '%${roleId}%'
 	</select>
 	
 	<!-- 权限与角色中间表 -->
@@ -338,6 +341,9 @@
 	</select>
 	
 	<!-- 功能模块 -->
+	<select id="getAllFunc" resultType="com.gf.model.FunctionInfo">
+		select * from gf_function where parentid is not null
+	</select>
 	<select id="getRootFunc" resultType="com.gf.model.FunctionInfo">
 		select * from gf_function where parentid is null
 	</select>
@@ -347,17 +353,61 @@
 	<select id="getChildFunc" resultType="com.gf.model.FunctionInfo">
 		select * from gf_function where parentid=#{id} order by priority
 	</select>
+	<select id="getListByPath" resultType="com.gf.model.FunctionInfo">
+		select * from gf_function where path like '${path}%' order by priority
+	</select>
 	<insert id="saveFunc" parameterType="com.gf.model.FunctionInfo"
 		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-		insert into gf_function(id,name,url,icon,priority,parentid)
-		values(#{id},#{name},#{url},#{icon},#{priority},#{parentId})
+		insert into gf_function(id,name,url,icon,priority,parentid,path,fullname)
+		values(#{id},#{name},#{url},#{icon},#{priority},#{parentId},#{path},#{fullName})
 	</insert>
 	<update id="updateFunc" parameterType="com.gf.model.FunctionInfo">
-		update gf_function set name=#{name},url=#{url},icon=#{icon},priority=#{priority},
-			parentid=#{parentId}
+		update gf_function set name=#{name},url=#{url},icon=#{icon},
+			priority=#{priority},parentid=#{parentId},path=#{path},fullname=#{fullName}
 		where id=#{id}
 	</update>
 	<delete id="deleteFunc" parameterType="Integer">
 		delete from gf_function where id=#{id}
 	</delete>
+	
+	<!-- 
+	菜单角色授权表，哪些角色具有哪些菜单权限配置，此表主要定制界面上的菜单显示
+	-->
+	<insert id="saveMenuRole" parameterType="com.gf.statusflow.def.Menu2RoleInfo">
+		insert into gf_menu2role(id,funcid,roleid)
+		values(#{id},#{funcId},#{roleId})
+	</insert>
+	<update id="updateMenuRole" parameterType="com.gf.statusflow.def.Menu2RoleInfo">
+		update gf_menu2role set funcid=#{funcId},roleid=#{roleId}
+			where id=#{id}
+	</update>
+	<delete id="deleteMenuRoleById" parameterType="String">
+		delete from gf_menu2role where id=#{id}
+	</delete>
+	<delete id="deleteMenuRoleByRoleId" parameterType="String">
+		delete from gf_menu2role where roleid=#{roleId}
+	</delete>
+	<delete id="deleteMenuRoleByFuncId" parameterType="String">
+		delete from gf_menu2role where funcid=#{funcId}
+	</delete>
+	<select id="getMenuRoleById" resultType="com.gf.statusflow.def.Menu2RoleInfo">
+		select * from gf_menu2role where id=#{id}
+	</select>
+	<select id="getMenuRoleByRoleId" resultType="com.gf.statusflow.def.Menu2RoleInfo">
+		select * from gf_menu2role where roleid=#{roleId}
+	</select>
+	<select id="getMenuRoleByFuncId" resultType="com.gf.statusflow.def.Menu2RoleInfo">
+		select * from gf_menu2role where funcid=#{funcId}
+	</select>
+	<select id="getFuncListByUserId" resultType="com.gf.model.FunctionInfo">
+		select f.* from gf_function f,gf_menu2role m2r,gf_role r,gf_orguserrole our
+			where f.id=m2r.funcid and m2r.roleid=r.id and r.id=our.roleid
+			and our.entityid=#{userId}
+	</select>
+	<select id="getAclMenu" resultType="com.gf.statusflow.def.Menu2RoleInfo">
+		select m2r.id,r.name roleName,f.name funcName 
+		from gf_function f,gf_role r,gf_menu2role m2r
+		where f.id=m2r.funcid and r.id=m2r.roleid
+			and (m2r.funcid like '%${funcId}%' and m2r.roleid like '%${roleId}%')
+	</select>
 </mapper>

@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 import com.gf.mapper.MainMapper;
 import com.gf.model.FunctionInfo;
 import com.gf.service.FunctionService;
+import com.gf.statusflow.IOrgModel;
 
 @Service
 public class FunctionServiceImpl implements FunctionService{
 	private Logger log = LoggerFactory.getLogger(FunctionServiceImpl.class);
 	@Autowired
 	private MainMapper mapper;
+	@Autowired
+	private IOrgModel orgmodel;
 
 	@Override
 	public FunctionInfo getRoot() {
@@ -63,24 +66,29 @@ public class FunctionServiceImpl implements FunctionService{
 		</div>
 	 */
 	@Override
-	public void recurseFunction(String userId,String id, StringBuffer sb) {
+	public void recurseFunction(String userId,String id, StringBuffer sb,
+			List<FunctionInfo> aclList) 
+	{
 		List<FunctionInfo> child = getMenu(id);
 		for(FunctionInfo fi:child)
 		{
-			sb.append("<div onclick='javascript:addTabCheckExist(\""+fi.getName()+"\",\""+fi.getUrl()+"\",\""+fi.getIcon()+"\");'>\r\n");
-			List<FunctionInfo> child2 = getMenu(fi.getId());
-			if(child2 != null && child2.size()>0)
+			if(hasPrivilege(userId,fi,aclList))
 			{
-				sb.append("<span>"+fi.getName()+"</span>\r\n");
-				sb.append("<div>\r\n");
-				recurseFunction(userId,fi.getId(),sb);
+				sb.append("<div data-options=\"iconCls:'"+fi.getIcon()+"'\" onclick='javascript:addTabCheckExist(\""+fi.getName()+"\",\""+fi.getUrl()+"\",\""+fi.getIcon()+"\");'>\r\n");
+				List<FunctionInfo> child2 = getMenu(fi.getId());
+				if(child2 != null && child2.size()>0)
+				{
+					sb.append("<span>"+fi.getName()+"</span>\r\n");
+					sb.append("<div>\r\n");
+					recurseFunction(userId,fi.getId(),sb,aclList);
+					sb.append("</div>\r\n");
+				}
+				else
+				{
+					sb.append(fi.getName()+"\r\n");
+				}
 				sb.append("</div>\r\n");
 			}
-			else
-			{
-				sb.append(fi.getName()+"\r\n");
-			}
-			sb.append("</div>\r\n");
 		}
 	}
 
@@ -97,20 +105,23 @@ public class FunctionServiceImpl implements FunctionService{
 		FunctionInfo root = getRoot();
 		if(root != null)
 		{
+			List<FunctionInfo> aclList = orgmodel.getFuncListByUserId(userId);
 			List<FunctionInfo> child = getMenu(root.getId());
 			StringBuffer sb = new StringBuffer();
 			sb.append("<div class=\"easyui-panel\" style=\"height:30px;padding-bottom:0px;background:#B3DFDA;\">\r\n");
 			StringBuffer sb2 = new StringBuffer();
 			for(FunctionInfo fi:child)
 			{
-				String id = fi.getId();
-				String icon = fi.getIcon();
-				String name = fi.getName();
-				sb.append("<a class=\"easyui-menubutton\" data-options=\"menu:'#"+id+"',iconCls:'"+icon+"'\">"+name+"</a>\r\n");
-				
-				sb2.append("<div id=\""+id+"\" style=\"width:150px;\">\r\n");
-				recurseFunction(userId,id,sb2);
-				sb2.append("</div>\r\n");
+				if(hasPrivilege(userId,fi,aclList))
+				{
+					String id = fi.getId();
+					String icon = fi.getIcon();
+					String name = fi.getName();
+					sb.append("<a class=\"easyui-menubutton\" data-options=\"menu:'#"+id+"',iconCls:'"+icon+"'\">"+name+"</a>\r\n");
+					sb2.append("<div id=\""+id+"\" style=\"width:150px;\">\r\n");
+					recurseFunction(userId,id,sb2,aclList);
+					sb2.append("</div>\r\n");
+				}
 			}
 			sb.append("<a class=\"easyui-linkbutton\" style=\"background:#B3DFDA;\" data-options=\"plain:true,iconCls:'pic_25'\" onclick=\"logout()\">退出系统</a>\r\n");
 			sb.append("</div>\r\n");
@@ -120,5 +131,23 @@ public class FunctionServiceImpl implements FunctionService{
 		return "";
 	}
 
-
+	public boolean hasPrivilege(String userId,FunctionInfo fi,List<FunctionInfo> aclList)
+	{
+		//如果是超级用户不受权限控制
+		if(IOrgModel.I_SYSADMIN_ID.equals(userId))
+			return true;
+		//第一种情况：权限列表aclList中存在元素的Path包含fi.path
+		for(FunctionInfo aclFi:aclList)
+		{
+			if(fi.getPath().startsWith(aclFi.getPath()))
+				return true;
+		}
+		//第二种情况：fi.path 包含在权限列表aclList中
+		for(FunctionInfo aclFi:aclList)
+		{
+			if(aclFi.getPath().startsWith(fi.getPath()))
+				return true;
+		}
+		return false;
+	}
 }

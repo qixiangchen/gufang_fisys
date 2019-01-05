@@ -14,6 +14,7 @@ import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Menu2RoleInfo;
 import com.gf.statusflow.def.Perm2RoleInfo;
 import com.gf.statusflow.def.PermissionInfo;
 
@@ -31,7 +32,7 @@ public class DefaultOrgModel implements IOrgModel{
 		if(sysUser == null)
 		{
 			sysUser = new DefaultUser();
-			sysUser.setId("1");
+			sysUser.setId(I_SYSADMIN_ID);
 			sysUser.setLoginId(I_SYSADMIN);
 			sysUser.setPassword(Util.getMD5(sysAdminPwd));
 			sysUser.setName("系统管理员");
@@ -459,11 +460,11 @@ public class DefaultOrgModel implements IOrgModel{
 		}
 	}
 	
-	public void deletePermByModule(String module)
+	public void deletePermByFuncId(String module)
 	{
 		try
 		{
-			mapper.deletePermByModule(module);
+			mapper.deletePermByFuncId(module);
 		}
 		catch(Exception e)
 		{
@@ -471,11 +472,25 @@ public class DefaultOrgModel implements IOrgModel{
 		}
 	}
 	
-	public List<PermissionInfo> getPermission()
+	public List<PermissionInfo> getPermissionByFuncId(String id)
 	{
 		try
 		{
-			return mapper.getPermission();
+			return mapper.getPermissionByFuncId(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<PermissionInfo> getPermission(String permId,
+			String funcId,String roleId)
+	{
+		try
+		{
+			return mapper.getPermission(permId,funcId,roleId);
 		}
 		catch(Exception e)
 		{
@@ -552,6 +567,19 @@ public class DefaultOrgModel implements IOrgModel{
 	 * 功能管理模块
 	 * @return
 	 */
+	public List<FunctionInfo> getAllFunc()
+	{
+		try
+		{
+			return mapper.getAllFunc();
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	public FunctionInfo getRootFunc()
 	{
 		try
@@ -575,6 +603,19 @@ public class DefaultOrgModel implements IOrgModel{
 		try
 		{
 			return mapper.getChildFunc(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<FunctionInfo> getListByPath(String path)
+	{
+		try
+		{
+			return mapper.getListByPath(path);
 		}
 		catch(Exception e)
 		{
@@ -619,7 +660,7 @@ public class DefaultOrgModel implements IOrgModel{
 	 */
 	public FunctionInfo initFunc()
 	{
-		String rootId = "root";
+		String rootId = "func000000000000";
 		FunctionInfo root = getFuncById(rootId);
 		if(root == null)
 		{
@@ -627,9 +668,11 @@ public class DefaultOrgModel implements IOrgModel{
 			root.setId(rootId);
 			root.setName("功能模块");
 			root.setParentId(null);
+			root.setPath("/func000000000000");
+			root.setFullName("/功能模块");
 			this.saveFunc(root);
 		}
-		String sysId = "system";
+		String sysId = "func000000001000";
 		FunctionInfo sys = getFuncById(sysId);
 		if(sys == null)
 		{
@@ -639,9 +682,11 @@ public class DefaultOrgModel implements IOrgModel{
 			sys.setIcon("pic_1");
 			sys.setParentId(root.getId());
 			sys.setPriority(1);
+			sys.setPath("/func000000000000/func000000001000");
+			sys.setFullName("/功能模块/系统管理");
 			this.saveFunc(sys);
 		}
-		String functionId = "function";
+		String functionId = "func000000001100";
 		FunctionInfo funmgr = getFuncById(functionId);
 		if(funmgr == null)
 		{
@@ -652,9 +697,11 @@ public class DefaultOrgModel implements IOrgModel{
 			funmgr.setParentId(sys.getId());
 			funmgr.setUrl("/function.action");
 			funmgr.setPriority(1);
+			funmgr.setPath("/func000000000000/func000000001000/func000000001100");
+			funmgr.setFullName("/功能模块/系统管理/功能管理");
 			this.saveFunc(funmgr);
 		}
-		String orgmodelId = "orgmodel";
+		String orgmodelId = "func000000001200";
 		FunctionInfo orgmodel = getFuncById(orgmodelId);
 		if(orgmodel == null)
 		{
@@ -664,9 +711,11 @@ public class DefaultOrgModel implements IOrgModel{
 			orgmodel.setIcon("pic_3");
 			orgmodel.setParentId(sys.getId());
 			orgmodel.setPriority(2);
+			orgmodel.setPath("/func000000000000/func000000001000/func000000001200");
+			orgmodel.setFullName("/功能模块/系统管理/组织机构");
 			this.saveFunc(orgmodel);
 		}
-		String orgId = "orgmodel_org";
+		String orgId = "func000000001210";
 		FunctionInfo org = getFuncById(orgId);
 		if(org == null)
 		{
@@ -677,9 +726,11 @@ public class DefaultOrgModel implements IOrgModel{
 			org.setParentId(orgmodel.getId());
 			org.setUrl("/org.action");
 			org.setPriority(2);
+			org.setPath("/func000000000000/func000000001000/func000000001200/func000000001210");
+			org.setFullName("/功能模块/系统管理/组织机构/部门管理");
 			this.saveFunc(org);
 		}
-		String userId = "orgmodel_user";
+		String userId = "func000000001220";
 		FunctionInfo user = getFuncById(userId);
 		if(user == null)
 		{
@@ -690,9 +741,11 @@ public class DefaultOrgModel implements IOrgModel{
 			user.setParentId(orgmodel.getId());
 			user.setUrl("/user.action");
 			user.setPriority(2);
+			user.setPath("/func000000000000/func000000001000/func000000001200/func000000001220");
+			user.setFullName("/功能模块/系统管理/组织机构/用户管理");
 			this.saveFunc(user);
 		}
-		String roleId = "orgmodel_role";
+		String roleId = "func000000001230";
 		FunctionInfo role = getFuncById(roleId);
 		if(role == null)
 		{
@@ -703,9 +756,11 @@ public class DefaultOrgModel implements IOrgModel{
 			role.setParentId(orgmodel.getId());
 			role.setUrl("/role.action");
 			role.setPriority(2);
+			role.setPath("/func000000000000/func000000001000/func000000001200/func000000001230");
+			role.setFullName("/功能模块/系统管理/组织机构/角色管理");
 			this.saveFunc(role);
 		}
-		String userroleId = "orgmodel_userrole";
+		String userroleId = "func000000001240";
 		FunctionInfo userrole = getFuncById(userroleId);
 		if(userrole == null)
 		{
@@ -716,9 +771,11 @@ public class DefaultOrgModel implements IOrgModel{
 			userrole.setParentId(orgmodel.getId());
 			userrole.setUrl("/roleuser.action");
 			userrole.setPriority(2);
+			userrole.setPath("/func000000000000/func000000001000/func000000001200/func000000001240");
+			userrole.setFullName("/功能模块/系统管理/组织机构/角色分配");
 			this.saveFunc(userrole);
 		}
-		String moduleId = "module";
+		String moduleId = "func000000001300";
 		FunctionInfo module = getFuncById(moduleId);
 		if(module == null)
 		{
@@ -729,7 +786,39 @@ public class DefaultOrgModel implements IOrgModel{
 			module.setParentId(sys.getId());
 			module.setUrl("/module.action");
 			module.setPriority(3);
+			module.setPath("/func000000000000/func000000001000/func000000001300");
+			module.setFullName("/功能模块/系统管理/模块权限");
 			this.saveFunc(module);
+		}
+		String moduleaclId = "func000000001400";
+		FunctionInfo moduleacl = getFuncById(moduleaclId);
+		if(moduleacl == null)
+		{
+			moduleacl = new FunctionInfo();
+			moduleacl.setId(moduleaclId);
+			moduleacl.setName("模块角色授权");
+			moduleacl.setIcon("pic_12");
+			moduleacl.setParentId(sys.getId());
+			moduleacl.setUrl("/moduleacl.action");
+			moduleacl.setPriority(4);
+			moduleacl.setPath("/func000000000000/func000000001000/func000000001400");
+			moduleacl.setFullName("/功能模块/系统管理/模块角色授权");
+			this.saveFunc(moduleacl);
+		}
+		String menuaclId = "func000000001500";
+		FunctionInfo menuacl = getFuncById(menuaclId);
+		if(menuacl == null)
+		{
+			menuacl = new FunctionInfo();
+			menuacl.setId(menuaclId);
+			menuacl.setName("菜单授权");
+			menuacl.setIcon("pic_18");
+			menuacl.setParentId(sys.getId());
+			menuacl.setUrl("/menuacl.action");
+			menuacl.setPriority(4);
+			menuacl.setPath("/func000000000000/func000000001000/func000000001500");
+			menuacl.setFullName("/功能模块/系统管理/菜单授权");
+			this.saveFunc(menuacl);
 		}
 		return root;
 	}
@@ -754,6 +843,134 @@ public class DefaultOrgModel implements IOrgModel{
 		try
 		{
 			return mapper.getFuncById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * 菜单角色相关Mybatis方法
+	 */
+	public void saveMenuRole(Menu2RoleInfo m2r)
+	{
+		try
+		{
+			mapper.saveMenuRole(m2r);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void updateMenuRole(Menu2RoleInfo m2r)
+	{
+		try
+		{
+			mapper.updateMenuRole(m2r);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deleteMenuRoleById(String id)
+	{
+		try
+		{
+			mapper.deleteMenuRoleById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deleteMenuRoleByRoleId(String roleId)
+	{
+		try
+		{
+			mapper.deleteMenuRoleByRoleId(roleId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public void deleteMenuRoleByFuncId(String funcId)
+	{
+		try
+		{
+			mapper.deleteMenuRoleByFuncId(funcId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+	}
+	
+	public Menu2RoleInfo getMenuRoleById(String id)
+	{
+		try
+		{
+			return mapper.getMenuRoleById(id);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<Menu2RoleInfo> getMenuRoleByRoleId(String roleId)
+	{
+		try
+		{
+			return mapper.getMenuRoleByRoleId(roleId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<Menu2RoleInfo> getMenuRoleByFuncId(String funcId)
+	{
+		try
+		{
+			return mapper.getMenuRoleByFuncId(funcId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<FunctionInfo> getFuncListByUserId(String userId)
+	{
+		try
+		{
+			return mapper.getFuncListByUserId(userId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
+	public List<Menu2RoleInfo> getAclMenu(String funcId,String roleId)
+	{
+		try
+		{
+			return mapper.getAclMenu(funcId,roleId);
 		}
 		catch(Exception e)
 		{

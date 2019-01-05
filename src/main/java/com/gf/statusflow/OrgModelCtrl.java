@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.gf.model.FunctionInfo;
 import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Menu2RoleInfo;
 import com.gf.statusflow.def.Perm2RoleInfo;
 import com.gf.statusflow.def.PermissionInfo;
 import com.gf.statusflow.def.TreeNode;
@@ -340,6 +342,7 @@ public class OrgModelCtrl {
 			TreeNode tn = new TreeNode();
 			tn.setId(role.getId());
 			tn.setText(role.getName());
+			tn.setState("open");
 			root.addChild(tn);
 		}
 
@@ -383,20 +386,96 @@ public class OrgModelCtrl {
 		return "/orgmodel/module";
 	}
 	
-	@RequestMapping("/moduleload.action")
-	@ResponseBody
-	public Map loadmodule(Integer page,Integer rows)
+	@RequestMapping("/moduleacl.action")
+	public String moduleacl()
 	{
-		PageHelper.startPage(page, rows);
-		List<PermissionInfo> lists = orgmodel.getPermission();
-		PageInfo pi = new PageInfo(lists);
-		Long total = pi.getTotal();
-		List<PermissionInfo> perms = pi.getList();
-		Map m = new HashMap();
-		m.put("total", total);
-		m.put("rows", perms);
-		return m;
+		return "/orgmodel/moduleacl";
 	}
+	
+	@ResponseBody
+	@RequestMapping("/modulefuncroot.action")
+	public List<TreeNode> funcroot()
+	{
+		FunctionInfo rootFi = orgmodel.getRootFunc();
+		if(rootFi == null)
+		{
+			rootFi = orgmodel.initFunc();
+		}
+		List<TreeNode> trees = new ArrayList<TreeNode>();
+		TreeNode rootTree = new TreeNode();
+		rootTree.setId(rootFi.getId().toString());
+		rootTree.setText(rootFi.getName());
+		rootTree.setState("closed");
+		Map attributes = new HashMap();
+		attributes.put("parentId",rootFi.getParentId());
+		attributes.put("path", "/");
+		attributes.put("fullName", "/"+rootFi.getName());
+		attributes.put("isload", "false");
+		rootTree.setAttributes(attributes);
+		
+		trees.add(rootTree);
+		return trees;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/modulegettreebyid")
+	public List<TreeNode> modulegettreebyid(String id)
+	{
+		List<FunctionInfo> funs = orgmodel.getChildFunc(id);
+		List<TreeNode> rtn = new ArrayList<TreeNode>();
+		if(funs != null && funs.size()>0)
+		{
+			for(FunctionInfo fi:funs)
+			{
+				TreeNode ti = new TreeNode();
+				ti.setId(fi.getId().toString());
+				ti.setText(fi.getName());
+				ti.setIconCls(fi.getIcon()!=null?fi.getIcon():"pic_1");
+				ti.setUrl(fi.getUrl());
+				List<FunctionInfo> chd = orgmodel.getChildFunc(fi.getId());
+				List<PermissionInfo> perms = orgmodel.getPermissionByFuncId(fi.getId());
+				if(chd != null && chd.size()>0)
+					ti.setState("closed");
+				else
+				{
+					//存在下一级授权信息
+					if(perms != null && perms.size()>0)
+						ti.setState("closed");
+					else
+						ti.setState("open");
+				}
+				ti.addAttribute("path",fi.getPath());
+				ti.addAttribute("fullName",fi.getFullName());
+				ti.addAttribute("isload","false");
+				if(fi.getPriority() != null)
+					ti.addAttribute("priority",fi.getPriority().toString());
+				if(fi.getParentId() != null)
+					ti.addAttribute("parentId",fi.getParentId().toString());
+				rtn.add(ti);
+			}
+		}
+		else
+		{
+			List<PermissionInfo> perms = orgmodel.getPermissionByFuncId(id);
+			for(PermissionInfo pi:perms)
+			{
+				TreeNode ti = new TreeNode();
+				ti.setId(pi.getId().toString());
+				ti.setText(pi.getName());
+				ti.setIconCls("pic_1");
+				ti.setUrl("");
+				ti.setState("open");
+				ti.addAttribute("path","");
+				ti.addAttribute("fullName","");
+				ti.addAttribute("isload","true");
+				ti.addAttribute("permission",pi.getPermission());
+				ti.addAttribute("funcId",pi.getFuncId());
+				rtn.add(ti);
+			}
+		}
+		return rtn;
+	}
+	
 	
 	@RequestMapping("/modulesave.action")
 	@ResponseBody
@@ -413,16 +492,37 @@ public class OrgModelCtrl {
 		return true;
 	}
 	
-	@RequestMapping("/moduledelete.action")
+	@RequestMapping("/moduleloadfunc.action")
 	@ResponseBody
-	public Boolean moduledelete(String[] id)
+	public List moduleloadfunc()
+	{
+		return orgmodel.getAllFunc();
+	}
+	
+	@RequestMapping("/moduleroleload.action")
+	@ResponseBody
+	public Map loadmodule(String funcId,String roleId,Integer page,Integer rows)
+	{
+		PageHelper.startPage(page, rows);
+		List<PermissionInfo> lists = orgmodel.getPermission(funcId,funcId,roleId);
+		PageInfo pi = new PageInfo(lists);
+		Long total = pi.getTotal();
+		List<PermissionInfo> perms = pi.getList();
+		Map m = new HashMap();
+		m.put("total", total);
+		m.put("rows", perms);
+		return m;
+	}
+	
+	@RequestMapping("/moduleroledelete.action")
+	@ResponseBody
+	public Boolean moduleroledelete(String[] id)
 	{
 		if(id != null)
 		{
 			for(String id2:id)
 			{
-				orgmodel.deletePermById(id2);
-				orgmodel.deletePerm2RoleByPermId(id2);
+				orgmodel.deletePerm2RoleById(id2);
 			}
 		}
 		return true;
@@ -436,18 +536,174 @@ public class OrgModelCtrl {
 		{
 			for(String permId2:permId)
 			{
-				orgmodel.deletePerm2RoleByPermId(permId2);
-				for(String roleId2:roleId)
+				//判断前台选中的是功能节点还是权限节点
+				if(permId2.startsWith("perm"))//是权限节点
 				{
-					if(!"".equals(Util.fmtStr(permId2)) && !"".equals(Util.fmtStr(roleId2)))
+					orgmodel.deletePerm2RoleByPermId(permId2);
+					for(String roleId2:roleId)
 					{
-						Perm2RoleInfo p2r = new Perm2RoleInfo();
-						p2r.setId(UUID.create("p2r"));
-						p2r.setPermId(permId2);
-						p2r.setRoleId(roleId2);
-						orgmodel.savePerm2Role(p2r);
+						if(!"".equals(Util.fmtStr(permId2)) && !"".equals(Util.fmtStr(roleId2)))
+						{
+							Perm2RoleInfo p2r = new Perm2RoleInfo();
+							p2r.setId(UUID.create("p2r"));
+							p2r.setPermId(permId2);
+							p2r.setRoleId(roleId2);
+							orgmodel.savePerm2Role(p2r);
+						}
 					}
 				}
+				else//是功能节点
+				{
+					FunctionInfo fi = orgmodel.getFuncById(permId2);
+					if(fi != null)
+					{
+						//根据路径查询所有子节点列表
+						List<FunctionInfo> child = orgmodel.getListByPath(fi.getPath());
+						for(FunctionInfo fi2:child)
+						{
+							//根据模块ID查询所有权限
+							List<PermissionInfo> perms = orgmodel.getPermissionByFuncId(fi2.getId());
+							//遍历所有权限
+							for(PermissionInfo pi:perms)
+							{
+								//删除已授权权限,重新授权
+								orgmodel.deletePerm2RoleByPermId(pi.getId());
+								//遍历角色
+								for(String roleId2:roleId)
+								{
+									if(!"".equals(Util.fmtStr(pi.getId())) && !"".equals(Util.fmtStr(roleId2)))
+									{
+										Perm2RoleInfo p2r = new Perm2RoleInfo();
+										p2r.setId(UUID.create("p2r"));
+										p2r.setPermId(pi.getId());
+										p2r.setRoleId(roleId2);
+										orgmodel.savePerm2Role(p2r);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	@RequestMapping("/menuacl.action")
+	public String menuacl()
+	{
+		return "/orgmodel/menuacl";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/menufuncroot.action")
+	public List<TreeNode> menufuncroot()
+	{
+		FunctionInfo rootFi = orgmodel.getRootFunc();
+		if(rootFi == null)
+		{
+			rootFi = orgmodel.initFunc();
+		}
+		List<TreeNode> trees = new ArrayList<TreeNode>();
+		TreeNode rootTree = new TreeNode();
+		rootTree.setId(rootFi.getId().toString());
+		rootTree.setText(rootFi.getName());
+		rootTree.setState("closed");
+		Map attributes = new HashMap();
+		attributes.put("parentId",rootFi.getParentId());
+		attributes.put("path", "/");
+		attributes.put("fullName", "/"+rootFi.getName());
+		attributes.put("isload", "false");
+		rootTree.setAttributes(attributes);
+		
+		trees.add(rootTree);
+		return trees;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/menugettreebyid")
+	public List<TreeNode> menugettreebyid(String id)
+	{
+		List<FunctionInfo> funs = orgmodel.getChildFunc(id);
+		List<TreeNode> rtn = new ArrayList<TreeNode>();
+		if(funs != null && funs.size()>0)
+		{
+			for(FunctionInfo fi:funs)
+			{
+				TreeNode ti = new TreeNode();
+				ti.setId(fi.getId().toString());
+				ti.setText(fi.getName());
+				ti.setIconCls(fi.getIcon()!=null?fi.getIcon():"pic_1");
+				ti.setUrl(fi.getUrl());
+				List<FunctionInfo> chd = orgmodel.getChildFunc(fi.getId());
+				if(chd != null && chd.size()>0)
+					ti.setState("closed");
+				else
+				{
+					ti.setState("open");
+				}
+				ti.addAttribute("path",fi.getPath());
+				ti.addAttribute("fullName",fi.getFullName());
+				ti.addAttribute("isload","false");
+				if(fi.getPriority() != null)
+					ti.addAttribute("priority",fi.getPriority().toString());
+				if(fi.getParentId() != null)
+					ti.addAttribute("parentId",fi.getParentId().toString());
+				rtn.add(ti);
+			}
+		}
+		return rtn;
+	}
+	
+	@RequestMapping("/menuroleload.action")
+	@ResponseBody
+	public Map menuroleload(String funcId,String roleId,Integer page,Integer rows)
+	{
+		PageHelper.startPage(page, rows);
+		List<Menu2RoleInfo> lists = orgmodel.getAclMenu(funcId,roleId);
+		PageInfo pi = new PageInfo(lists);
+		Long total = pi.getTotal();
+		List<Menu2RoleInfo> perms = pi.getList();
+		Map m = new HashMap();
+		m.put("total", total);
+		m.put("rows", perms);
+		return m;
+	}
+	
+	@RequestMapping("/menurolesave.action")
+	@ResponseBody
+	public Boolean menurolesave(String[] funcId,String[] roleId)
+	{
+		if(funcId != null && roleId != null)
+		{
+			for(String funcId2:funcId)
+			{
+				orgmodel.deleteMenuRoleByFuncId(funcId2);
+				for(String roleId2:roleId)
+				{
+					if(!"".equals(Util.fmtStr(funcId2)) && !"".equals(Util.fmtStr(roleId2)))
+					{
+						Menu2RoleInfo m2r = new Menu2RoleInfo();
+						m2r.setId(UUID.create("m2r"));
+						m2r.setFuncId(funcId2);
+						m2r.setRoleId(roleId2);
+						orgmodel.saveMenuRole(m2r);
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	@RequestMapping("/menuroledelete.action")
+	@ResponseBody
+	public Boolean menuroledelete(String[] id)
+	{
+		if(id != null)
+		{
+			for(String id2:id)
+			{
+				orgmodel.deleteMenuRoleById(id2);
 			}
 		}
 		return true;

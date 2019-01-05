@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gf.model.FunctionInfo;
 import com.gf.service.FunctionService;
 import com.gf.statusflow.IOrgModel;
+import com.gf.statusflow.IUser;
 import com.gf.statusflow.StatusFlowData;
 import com.gf.statusflow.StatusFlowMng;
 import com.gf.statusflow.StatusMsg;
@@ -69,6 +70,9 @@ public class MainCtrl {
 	        //进行验证，这里可以捕获异常，然后返回对应信息
 	        subject.login(upToken);
 	        System.out.println("2=========="+subject.getPrincipal());
+	        IUser user = orgmodel.getUserByLoginId(subject.getPrincipal().toString());
+	        subject.getSession().setAttribute("loginuser", user);
+	        
 	        
 			//记录Cookie
 			Cookie c = new Cookie("loginId",loginId);  
@@ -93,7 +97,9 @@ public class MainCtrl {
 	@RequestMapping("/main.action")
 	public String main(HttpServletRequest req)
 	{
-		String userId = "";
+		Subject subject = SecurityUtils.getSubject();
+		IUser user = (IUser)subject.getSession().getAttribute("loginuser");
+		String userId = user.getId();
 		String menu = serv.generateMenuBar(userId);
 		req.setAttribute("menu", menu);
 		return "main";
@@ -123,6 +129,7 @@ public class MainCtrl {
 		Map attributes = new HashMap();
 		attributes.put("parentId",rootFi.getParentId());
 		attributes.put("path", "/");
+		attributes.put("fullName", "/"+rootFi.getName());
 		attributes.put("isload", "false");
 		rootTree.setAttributes(attributes);
 		
@@ -139,8 +146,12 @@ public class MainCtrl {
 		{
 			return false;
 		}
-		fi.setId(UUID.create("function"));
+		FunctionInfo parent = orgmodel.getFuncById(parentId);
+		String id = UUID.create("function");
+		fi.setId(id);
 		fi.setParentId(parentId);
+		fi.setPath(parent.getPath()+"/"+id);
+		fi.setFullName(parent.getFullName()+"/"+fi.getName());
 		orgmodel.saveFunc(fi);
 		return true;
 	}
@@ -169,6 +180,21 @@ public class MainCtrl {
 	}
 	
 	@ResponseBody
+	@RequestMapping("/funcicon.action")
+	public List funcicon()
+	{
+		List lst = new ArrayList();
+		for(int i=1;i<=100;i++)
+		{
+			Map m = new HashMap();
+			m.put("id","pic_"+i);
+			m.put("name","pic_"+i);
+			lst.add(m);
+		}
+		return lst;
+	}
+	
+	@ResponseBody
 	@RequestMapping("/gettreebyid")
 	public List<TreeNode> gettreebyid(String id)
 	{
@@ -186,6 +212,8 @@ public class MainCtrl {
 				ti.setState("closed");
 			else
 				ti.setState("open");
+			ti.addAttribute("path",fi.getPath());
+			ti.addAttribute("fullName",fi.getFullName());
 			ti.addAttribute("isload","false");
 			if(fi.getPriority() != null)
 				ti.addAttribute("priority",fi.getPriority().toString());

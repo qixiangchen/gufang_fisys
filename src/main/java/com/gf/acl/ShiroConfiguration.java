@@ -85,13 +85,13 @@ public class ShiroConfiguration {
 		return handlerExceptionResolver;
 	}
 
-    @Bean
-    public DefaultWebSessionManager createSessionManager()
-    {
-    	DefaultWebSessionManager sm = new DefaultWebSessionManager();
-    	return sm;
-    }
-    
+//    @Bean
+//    public DefaultWebSessionManager createSessionManager()
+//    {
+//    	DefaultWebSessionManager sm = new DefaultWebSessionManager();
+//    	return sm;
+//    }
+//    
 //    @Bean
 //    public SessionListener mySessionListener()
 //    {

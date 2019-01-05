@@ -8,6 +8,8 @@ public class FunctionInfo implements Serializable{
 	private String url = null;
 	private Integer priority = null;
 	private String parentId = null;
+	private String path = null;
+	private String fullName = null;
 	private String icon = null;
 	public String getId() {
 		return id;
@@ -38,6 +40,18 @@ public class FunctionInfo implements Serializable{
 	}
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
+	}
+	public String getPath() {
+		return path;
+	}
+	public void setPath(String path) {
+		this.path = path;
+	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 	public String getIcon() {
 		return icon;

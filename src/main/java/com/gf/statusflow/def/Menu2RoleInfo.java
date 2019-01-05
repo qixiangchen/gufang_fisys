@@ -1,13 +1,11 @@
 package com.gf.statusflow.def;
 
-public class PermissionInfo {
+public class Menu2RoleInfo {
 	private String id = null;
 	private String funcId = null;
-	private String name = null;//权限名称
-	private String permission = null;//对应到Controller上的注解名称 @RequiresPermissions("url:orgsave.action")
+	private String roleId = null;
 	private String funcName = null;
 	private String roleName = null;
-	private String roleId = null;
 	public String getId() {
 		return id;
 	}
@@ -20,17 +18,11 @@ public class PermissionInfo {
 	public void setFuncId(String funcId) {
 		this.funcId = funcId;
 	}
-	public String getName() {
-		return name;
+	public String getRoleId() {
+		return roleId;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getPermission() {
-		return permission;
-	}
-	public void setPermission(String permission) {
-		this.permission = permission;
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
 	}
 	public String getFuncName() {
 		return funcName;
@@ -44,10 +36,4 @@ public class PermissionInfo {
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
 	}
-	public String getRoleId() {
-		return roleId;
-	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
-	}	
 }

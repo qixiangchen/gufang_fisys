@@ -12,6 +12,7 @@ import com.gf.statusflow.def.DefaultOrg;
 import com.gf.statusflow.def.DefaultOrgUserRole;
 import com.gf.statusflow.def.DefaultRole;
 import com.gf.statusflow.def.DefaultUser;
+import com.gf.statusflow.def.Menu2RoleInfo;
 import com.gf.statusflow.def.Perm2RoleInfo;
 import com.gf.statusflow.def.PermissionInfo;
 
@@ -70,8 +71,11 @@ public interface WorkflowMapper {
 	public void savePermission(PermissionInfo permission);
 	public void updatePermission(PermissionInfo permission);
 	public void deletePermById(@Param("id") String id);
-	public void deletePermByModule(@Param("moduleName") String id);
-	public List<PermissionInfo> getPermission();
+	public void deletePermByFuncId(@Param("funcId") String id);
+	public List<PermissionInfo> getPermissionByFuncId(@Param("funcId") String id);
+	public List<PermissionInfo> getPermission(@Param("permId") String permId,
+			@Param("funcId") String funcId,
+			@Param("roleId") String roleId);
 	
 	/**
 	 * 角色与权限中间表Mybatis方法
@@ -85,12 +89,29 @@ public interface WorkflowMapper {
 	/**
 	 * 功能模块相关Mybatis方法
 	 */
+	public List<FunctionInfo> getAllFunc();
 	public FunctionInfo getRootFunc();
 	public FunctionInfo getFuncById(@Param("id") String id);
 	public List<FunctionInfo> getChildFunc(@Param("id") String id);
+	public List<FunctionInfo> getListByPath(@Param("path") String path);
 	public void saveFunc(FunctionInfo fi);
 	public void updateFunc(FunctionInfo fi);
 	public void deleteFunc(@Param("id") String id);
+	
+	/**
+	 * 菜单角色相关Mybatis方法
+	 */
+	public void saveMenuRole(Menu2RoleInfo m2r);
+	public void updateMenuRole(Menu2RoleInfo m2r);
+	public void deleteMenuRoleById(@Param("id") String id);
+	public void deleteMenuRoleByRoleId(@Param("roleId") String roleId);
+	public void deleteMenuRoleByFuncId(@Param("funcId") String funcId);
+	public Menu2RoleInfo getMenuRoleById(@Param("id") String id);
+	public List<Menu2RoleInfo> getMenuRoleByRoleId(@Param("roleId") String roleId);
+	public List<Menu2RoleInfo> getMenuRoleByFuncId(@Param("funcId") String funcId);
+	public List<FunctionInfo> getFuncListByUserId(@Param("userId") String userId);
+	public List<Menu2RoleInfo> getAclMenu(@Param("funcId") String funcId,
+			@Param("roleId") String roleId);
 	
 	/**
 	 * 工作流相关Mybatis方法

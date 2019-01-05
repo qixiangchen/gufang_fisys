@@ -22,6 +22,14 @@
 	</status>
 	<status id="account" name="财务审批" type="asynchronized" isstart="false">
 		<tostatuses>
+			<tostatus batchid="vp" id="vp" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+		</tostatuses>
+		<actors>
+			<actor type="role" id="gf:WF财务"/>
+		</actors>
+	</status>
+	<status id="vp" name="副总审批" type="asynchronized" isstart="false">
+		<tostatuses>
 			<tostatus type="switch" batchid="tosend" id="send" name="发货" condition="days &gt; 5" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
 			<tostatus type="switch" batchid="tosend" id="send2" name="发货" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
 			<tostatus type="switch" batchid="tosend" id="send3" name="发货" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
@@ -32,6 +40,20 @@
 			<actor type="role" id="gf:WF财务"/>
 		</actors>
 	</status>
+	<!-- 
+	<status id="account" name="财务审批" type="asynchronized" isstart="false">
+		<tostatuses>
+			<tostatus type="switch" batchid="tosend" id="send" name="发货" condition="days &gt; 5" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
+			<tostatus type="switch" batchid="tosend" id="send2" name="发货" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
+			<tostatus type="switch" batchid="tosend" id="send3" name="发货" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="createoutstore"/>
+			<tostatus batchid="tostarter" id="draft" name="返回修改" condition="false" invoke="" invokecommand=""/>
+			<tostatus batchid="destory" id="destory" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+		</tostatuses>
+		<actors>
+			<actor type="role" id="gf:WF财务"/>
+		</actors>
+	</status>
+	 -->
 	<status id="send" name="发货" type="asynchronized" isstart="false" workflow="outstore" condition="storeName EQ '发货库A（运达）'">
 		<tostatuses>
 			<tostatus batchid="end" id="end" name="完成" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="outstore"/>
