@@ -30,6 +30,8 @@ public class StatusFlowWAPI
 	private WorkflowMapper mapper;
 	@Autowired
 	private DependenceUtil dpdutil;
+	@Autowired
+	private UiImage uiimg = null;
 	
 	public StatusFlowWAPI()
 	{
@@ -459,7 +461,7 @@ public class StatusFlowWAPI
 	}
 
 	//通过流程实例数据取得流程下一节点名称及参数
-	public java.util.List getNextTask(String nexttask,String instWorkitemId,StatusMsg msg)throws Exception
+	public java.util.List getNextTask(String nexttask,String instWorkitemId,StatusMsg msg) throws Exception
 	{
 		if(msg == null)
 			msg = new StatusMsg();
@@ -968,12 +970,208 @@ public class StatusFlowWAPI
 	}
 	
 	//需要区分分系统标志flag和测试标志testMode
+	/**
+	* defProcessId:流程模板ID
+	* userId:流程启动者
+	* instanceId:业务数据ID
+	* type:业务标示,启动流程根据业务分类指定
+	* title:待办件标题
+	* nexttask:用于流程分支判断标志,其值为状态id
+	* url:业务应用
+	*/
+	@Transactional(readOnly = false,propagation=Propagation.REQUIRED)
+	public StatusMsg startWorkflow(String defProcessId,String startUserId,
+			java.util.List userIdLst,String instanceId,String type,String title,
+			String nexttask,String url,java.util.HashMap hmap,
+			String flag2,String testMode) throws Exception
+	{
+		try
+		{			
+			StatusMsg msg = new StatusMsg();
+			if("".equals(Util.fmtStr(startUserId)))
+			{
+				msg.setOk(false);
+				msg.setCode("WF000006");
+				msg.setMsg("启动用户(startUserId) "+startUserId+" 未定义");
+				return msg;
+			}
+			DefProcess defProcess = checkValid(defProcessId,instanceId,type,title,url,msg);
+			if(!msg.isOk())
+				return msg;
+			DefStatus defStartStatus = defProcess.getStart();
+			if(defStartStatus == null)
+			{
+				msg.setOk(false);
+				msg.setCode("WF000007");
+				msg.setMsg("工作流模板 "+defProcessId+" 未定义开始状态,请检查模板文件:"+defProcessId+".xml");
+				return msg;
+			}
+			
+			//工作流前置触发应用
+			Properties beforeProp = getInvokeApp(defProcessId,defStartStatus.getId(),
+					nexttask,msg);
+			if(!msg.isOk())
+				return msg;
+			if(beforeProp != null)
+			{
+				String clz = beforeProp.getProperty("invoke");
+				String command = beforeProp.getProperty("command");
+				if(!"".equals(clz))
+				{
+					StatusMsg rtn = beforeInvokeApp(clz,command,defProcess.getId(),type,instanceId,
+						startUserId,userIdLst,title,url,defStartStatus.getId(),nexttask,flag2,testMode);
+					if(rtn != null && !rtn.isOk())
+						return rtn;
+				}
+			}
+			
+			String xmlData = "";
+			if(hmap != null)
+			{
+				xmlData = xmlData + "<?xml version=\"1.0\" encoding=\"gb2312\"?><data>";
+				java.util.Set keyset = hmap.keySet();
+				for(java.util.Iterator it=keyset.iterator();it.hasNext();)
+				{
+					Object key = it.next();
+					Object value = hmap.get(key);
+					xmlData = xmlData + "<"+key+"><![CDATA["+value+"]]></"+key+">";
+				}
+				xmlData = xmlData + "</data>";
+			}
+	
+			String instProcessId = dpdutil.createId("process");
+			java.sql.Timestamp finishTime = null;
+			String processName = defProcess.getName();
+			String statusId = defStartStatus.getId();
+			String statusName = defStartStatus.getName();
+			//添加开始节点待办件(已办结)
+	
+			String startWorkItemId = dpdutil.createId("workitem");
+			String startInstActivityId = dpdutil.createId("activity");
+			//如果传入url为空，取工作流节点定义的url
+			String startUrl = null;
+			if(url == null)
+				startUrl = getUrl("Start",defProcessId);
+			else
+				startUrl = url;
+			//2016/04/04
+			//表单A创建工作流时,开始节点不产生待办件，如果第二个节点表单B与表单A不是同一实体，
+			//在开始节点办结件需要记录表单A的实体ID,通过originalid传入
+			//参考验货单流程
+			//开始(验货单)------>入库(入库单)--------->结束(验货单)
+			String originalId = instanceId;
+			Object originalObj = hmap.get("originalid");
+			if(originalObj != null)
+			{
+				originalId = (String)originalObj;
+			}
+			//--------------------------------------------end
+			//创建开始节点办结记录
+			DefWorkItem dwi = saveWorkItem(startWorkItemId,instProcessId,startInstActivityId,startUserId,
+					startUserId,new java.sql.Timestamp(new java.util.Date().getTime()-60*1000),
+					new java.sql.Timestamp(new java.util.Date().getTime()-60*1000),
+					defProcessId,processName,title,originalId,startUrl,statusId,statusName,
+					type,xmlData,"done",flag2,testMode);
+			
+			//记录instProcessId,instActivityId,instWorkitemId到wfMsg,以备保存意见
+			msg.setInstProcessId(dwi.getInstProcessId());
+			msg.setInstActivityId(dwi.getInstActivityId());
+			msg.setInstWorkitemId(dwi.getId());
+			msg.setInstanceId(instanceId);
+	
+	        String newInstActivityId = dpdutil.createId("activity");
+	        //如果传入url为空，取工作流节点定义的url
+	        String nextUrl = null;
+	        if(url == null)
+	        	nextUrl = getUrl(nexttask,defProcessId);
+	        else
+	        	nextUrl = url;
+	        //创建下一环节待办件
+	        java.util.List<DefWorkItem> dwiList = createNewWorkitem(defProcess,instProcessId,
+	        		newInstActivityId,null,statusId,startUserId,
+	        		startUserId,userIdLst,instanceId,type,title,
+	        		nexttask,nextUrl,xmlData,null,flag2,testMode);         
+			
+			//如果流转结束添加结束待办件(已办结)
+			DefStatus endStatus = defProcess.getStatus(nexttask);
+			//if(endStatus != null && "end".equals(endStatus.getId()))
+			if(endStatus != null && endStatus.getId().startsWith("end"))
+			{
+				String endWorkItemId = dpdutil.createId("workitem");
+				String endInstActivityId = dpdutil.createId("activity");
+				//如果传入url为空，取工作流节点定义的url
+				String endUrl = null;
+				if(url == null)
+					endUrl = getUrl("end",defProcessId);
+				else
+					endUrl = url;
+				//生成办结记录
+				saveWorkItem(endWorkItemId,instProcessId,endInstActivityId,endStatus.getId(),startUserId,new java.sql.Timestamp(new java.util.Date().getTime()+60*1000),
+						new java.sql.Timestamp(new java.util.Date().getTime()+60*1000),
+						defProcessId,processName,title,instanceId,endUrl,endStatus.getId(),
+						endStatus.getName(),type,xmlData,"done",flag2,testMode);
+				
+		        //工作流后置触发应用
+		        Properties afterProp = getInvokeApp2(instProcessId,startInstActivityId,nexttask,msg);	        
+		        if(afterProp != null)
+		        {
+		            String clz = beforeProp.getProperty("invoke");
+		            String command = beforeProp.getProperty("command");
+		            if(!"".equals(clz))
+		            {                               
+		                afterInvokeApp(clz,command,defProcess.getId(),type,instanceId,
+		                                instProcessId,newInstActivityId,dwiList,startUserId,userIdLst,
+		                                title,url,"start",nexttask,flag2,testMode);
+		            }
+		        }
+			}
+			else
+			{
+		        //工作流后置触发应用
+		        Properties afterProp = getInvokeApp2(instProcessId,startInstActivityId,nexttask,msg);	        
+		        if(afterProp != null)
+		        {
+		            String clz = beforeProp.getProperty("invoke");
+		            String command = beforeProp.getProperty("command");
+		            if(!"".equals(clz))
+		            {                               
+		                afterInvokeApp(clz,command,defProcess.getId(),type,instanceId,
+		                                instProcessId,newInstActivityId,dwiList,startUserId,userIdLst,
+		                                title,url,"start",nexttask,flag2,testMode);
+		            }
+		        }
+			}
+	
+			//删除undo待办件
+			//deleteUndoWorkItem(instanceId);
+			
+			//完成开始undo待办件
+			finishStartWorkItem(instanceId);
+			return msg;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	//需要区分分系统标志flag和测试标志testMode
 	@Transactional(readOnly = false,propagation=Propagation.REQUIRED)
 	public StatusMsg submitWorkflow(String instProcessId,String instActivityId,
 			String instWorkitemId,java.util.List userIdLst,String instanceId,
 			String type,String title,String nexttask,String url,
 			java.util.HashMap hmap,String flag2,String testMode) throws Exception
 	{
+		System.out.println("instProcessId==="+instProcessId);
+		System.out.println("instActivityId==="+instActivityId);
+		System.out.println("instWorkitemId==="+instWorkitemId);
+		System.out.println("userIdLst==="+userIdLst);
+		System.out.println("instanceId==="+instanceId);
+		System.out.println("type==="+type);
+		System.out.println("title==="+title);
+		System.out.println("nexttask==="+nexttask);
+		System.out.println("hmap==="+hmap);
 		try
 		{
 			StatusMsg msg = new StatusMsg();
@@ -1141,6 +1339,14 @@ public class StatusFlowWAPI
 		String startUserId,String fromUserId,java.util.List userIdLst,String instanceId,String type,String title,String nexttask,
 		String url,String xmlData,String flag,String flag2,String testMode) throws Exception
 	{
+		System.out.println("createNewWorkitem instProcessId="+instProcessId);
+		System.out.println("createNewWorkitem instActivityId="+instActivityId);
+		System.out.println("createNewWorkitem instWorkitemId="+instWorkitemId);
+		System.out.println("createNewWorkitem statusId="+statusId);
+		System.out.println("createNewWorkitem startUserId="+startUserId);
+		System.out.println("createNewWorkitem fromUserId="+fromUserId);
+		System.out.println("createNewWorkitem userIdLst="+userIdLst);
+		System.out.println("createNewWorkitem instanceId="+instanceId);
 		java.util.List<DefWorkItem> dwiList = new java.util.ArrayList<DefWorkItem>();
 		//String newInstActivityId = dpdutil.createId("activity");
 		//获取下一环节
@@ -1560,7 +1766,10 @@ public class StatusFlowWAPI
 	@Transactional(readOnly = false,propagation=Propagation.REQUIRED)
 	public String getInstProcessIdByInstanceId(String instanceId) throws Exception
 	{	
-		return mapper.getInstProcessIdByInstanceId(instanceId);
+		List<String> lst = mapper.getInstProcessIdByInstanceId(instanceId);
+		if(lst != null && lst.size()>0)
+			return lst.get(0);
+		return null;
 	}
 	
 	//instanceId 可以区分分系统标志flag和测试标志testMode
@@ -1833,7 +2042,6 @@ public class StatusFlowWAPI
 			dwiList2.add(dwiDim[i]);
 		}
 		
-		UiImage uiimg = new UiImage();
 		return uiimg.genImage(processId, dwiList2,width,height);
 	}
 	
@@ -1868,7 +2076,6 @@ public class StatusFlowWAPI
 			dwiList2.add(dwiDim[i]);
 			processId = dwiDim[i].getProcessId();
 		}
-		UiImage uiimg = new UiImage();
 		return uiimg.genImage(processId, dwiList2,width,height);
 	}
 	
@@ -1897,6 +2104,9 @@ public class StatusFlowWAPI
 		String userId = dwi.getUserId();
 		String userName = dpdutil.getUserName(userId);
 		dwi.setUserIdName(userName);
+		String startUserId = dwi.getStartUserId();
+		String startUserName = dpdutil.getUserName(startUserId);
+		dwi.setStartUserIdName(startUserName);
 	}
 	
 	private void fillData(List<DefWorkItem> dwiList)

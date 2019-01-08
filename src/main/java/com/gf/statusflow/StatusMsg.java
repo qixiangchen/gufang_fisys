@@ -1,5 +1,9 @@
 package com.gf.statusflow;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 public class StatusMsg {
 	private boolean isOk = true;
 	private String code = "WF000000";

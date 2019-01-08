@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="gb2312"?>
+
+<process id="gf_order" name="订单流程" description="">
+	<node id="Start" name="开始" x="20" y="20" textx="20" texty="60" namex="20" namey="40" username="">
+		<tonode id="account"/>
+	</node>
+	<node id="draft" name="修改" x="120" y="60" textx="120" texty="100" namex="120" namey="80" username="">
+		<tonode id="account"/>
+		<tonode id="destory"/>
+	</node>
+	<node id="account" name="财务审批" x="220" y="20" textx="220" texty="60" namex="220" namey="40" username="财务审批人员">
+		<tonode id="vp"/>
+		<tonode id="destory"/>
+	</node>
+	<node id="vp" name="副总审批" x="400" y="20" textx="430" texty="55" namex="420" namey="35" username="济南库管">
+		<tonode id="destory"/>
+		<tonode id="end"/>
+	</node>
+	<node id="destory" name="作废" x="300" y="60" textx="300" texty="100" namex="300" namey="80" username="">
+	
+	</node>
+	<node id="notice" name="通知申请人" x="550" y="20" textx="560" texty="60" namex="560" namey="40" username="">
+	
+	</node>
+	<node id="end" name="结束" x="650" y="20" textx="660" texty="60" namex="660" namey="40" username="">
+	
+	</node>
+</process>

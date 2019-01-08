@@ -45,7 +45,8 @@ public interface IOrgModel
 	public DefaultUser getManagerById(String userId);
 	public List<DefaultUser> getUserByManagerId(String managerId);
 	public DefaultUser checkLogin(String loginId,String password);
-	public DefaultUser getUserByLoginId(String loginId);
+	public IUser getUserByLoginId(String loginId);
+	public IUser getUserById(String userId);
 	
 	/**
 	 * 角色相关Mybatis方法
@@ -92,8 +93,6 @@ public interface IOrgModel
 	 * @param userId
 	 * @return
 	 */
-	public IUser getUserById(String userId);
-	public IUser getUserByLoginId(String flag,String loginId);
 	public List<IOrg> getUserListByOrgId(String orgId,String flag);
 	public IRole getRoleByNameFlag(String name,String flag);
 	public List<IOrgUserRole> getOrgUserRoleListByRoleId(String roleId);

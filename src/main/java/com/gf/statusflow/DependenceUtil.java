@@ -57,10 +57,11 @@ public class DependenceUtil
 	
 	public IUser getUserNameByLoginId(String loginId)
 	{
-		Properties prop = Util.getLoginProp(loginId);
-		String flag = prop.getProperty("flag");
-		String loginId2 = prop.getProperty("loginid");
-		IUser user = orgmodel.getUserByLoginId(flag,loginId2);
+		//Properties prop = Util.getLoginProp(loginId);
+		//String flag = prop.getProperty("flag");
+		//String loginId2 = prop.getProperty("loginid");
+		String flag = "gf";
+		IUser user = orgmodel.getUserByLoginId(loginId);
 		if(user == null)
 			return null;
 		return user;

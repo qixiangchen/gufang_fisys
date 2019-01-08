@@ -4,12 +4,27 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+
 
 public class Util {
 	private static Logger log = LoggerFactory.getLogger(Util.class);
 	private static Properties wfProp = null;
+	private static ApplicationContext ctx = null;
+	
+	public static void setCtx(ApplicationContext actx)
+	{
+		ctx = actx;
+	}
+	
+	public static Object getBean(Class clz)
+	{
+		return ctx.getBean(clz);
+	}
 	
 	public static String fmtStr(Object obj)
 	{
@@ -18,8 +33,33 @@ public class Util {
 		return obj.toString();
 	}
 	
+	public static String getString(javax.servlet.http.HttpServletRequest req,String name)
+	{
+		String value = fmtStr(req.getParameter(name));	
+		return value;
+	}
 	
-   public static String getMD5(String pwd)
+	public static Integer getInteger(javax.servlet.http.HttpServletRequest req,String name)
+	{
+		String value = fmtStr(req.getParameter(name));
+		try
+		{
+			return Integer.parseInt(value);
+		}
+		catch(Exception e)
+		{
+			return new Integer(0);
+		}
+	}
+	
+	public static IUser getLoginUser()
+	{
+		Subject subject = SecurityUtils.getSubject();
+		IUser user = (IUser)subject.getSession().getAttribute("loginuser");
+		return user;
+	}
+	
+	public static String getMD5(String pwd)
 	{   
         byte[] source = pwd.getBytes();   
         String s = null;      

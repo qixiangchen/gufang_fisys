@@ -152,6 +152,32 @@ public class OrgModelCtrl {
 		return "/orgmodel/user";
 	}
 	
+	//加载根部门
+	@RequestMapping("/userorgroot.action")
+	@ResponseBody
+	public List<TreeNode> userorgroot()
+	{
+		List<TreeNode> roots = new ArrayList<TreeNode>();
+		IOrg org = orgmodel.getRootOrg();
+		TreeNode tn = fromOrg(org);
+		roots.add(tn);
+		return roots;
+	}
+	
+	//加载下一级部门
+	@RequestMapping("/userorgchild.action")
+	@ResponseBody
+	public List<TreeNode> userorgchild(String id)
+	{
+		List<TreeNode> roots = new ArrayList<TreeNode>();
+		List<DefaultOrg> orgs = orgmodel.getOrgList(id);
+		for(IOrg org:orgs)
+		{
+			roots.add(fromOrg(org));
+		}
+		return roots;
+	}
+	
 	@RequestMapping("/userload")
 	@ResponseBody
 	public Map userload(Integer page,Integer rows,String orgId)
@@ -194,6 +220,27 @@ public class OrgModelCtrl {
 		m.put("total", total);
 		m.put("rows", users);
 		return m;
+	}
+	
+	@RequestMapping("/userdelete.action")
+	@ResponseBody
+	public String userdelete(String id)
+	{
+		String successRtn = "";
+		String failureRtn = "";
+		log.debug("userdelete id="+id);
+		String[] dim = id.split(",");
+		for(String userId:dim)
+		{
+			if(!"".equals(Util.fmtStr(userId)))
+			{
+				IUser user = orgmodel.getUserById(userId);
+				orgmodel.deleteUser(userId);
+				successRtn = successRtn + user.getName();
+			}
+		}
+		String rtn = "删除成功:"+successRtn+"\r\n";
+		return rtn;
 	}
 	
 	@RequestMapping("/userrolequery.action")
@@ -240,7 +287,7 @@ public class OrgModelCtrl {
 		log.debug("usersave pwd="+pwd+",md5="+md5);
 		duser.setPassword(md5);
 		String loginId = duser.getLoginId();
-		DefaultUser loginUser = orgmodel.getUserByLoginId(loginId);
+		IUser loginUser = orgmodel.getUserByLoginId(loginId);
 		log.debug("usersave loginUser="+loginUser);
 		if("".equals(Util.fmtStr(id)))
 		{

@@ -44,6 +44,7 @@ public interface WorkflowMapper {
 	public DefaultUser checkLogin(@Param("loginId") String loginId,
 			@Param("password") String password);
 	public DefaultUser getUserByLoginId(@Param("loginId") String loginId);
+	public DefaultUser getUserById(@Param("id") String id);
 	
 	/**
 	 * 角色相关Mybatis方法
@@ -156,7 +157,7 @@ public interface WorkflowMapper {
 			@Param("flag") String flag);
 	public List<DefWorkItem> getWorkItemListByInstanceIdAndStatusId(@Param("instanceId") String instanceId,
 			@Param("statusId") String statusId);
-	public String getInstProcessIdByInstanceId(@Param("instanceId") String instanceId);
+	public List<String> getInstProcessIdByInstanceId(@Param("instanceId") String instanceId);
 	public List<DefWorkItem> getUndoWorkItem(@Param("instanceId") String instanceId,
 			@Param("userId") String userId);
 	public List<DefWorkItem> getWorkItemByInstanceIdAndFlag(@Param("instanceId") String instanceId,

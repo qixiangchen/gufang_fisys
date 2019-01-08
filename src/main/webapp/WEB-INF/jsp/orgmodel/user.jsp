@@ -14,65 +14,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>财务报销系统</title>
 <script>
-function addsuborg()
+function deleteuser()
 {
-	var objs = $('#tree').tree('getChecked');
-	if(objs.length != 1)
-	{
-		$.messager.alert('错误','请选中一个父节点');
-		return;
-	}
-	var id = objs[0].id;
-	$('#parentId').val(id);
-	$('#frm').form('submit', {    
-	    url:'/orgsubsave.action',    
-	    onSubmit: function(){    
-	          
-	    },    
-	    success:function(data){    
-	    	reloadtree();
-	    }    
-	}); 
-}
-function updatesuborg()
-{
-	$('#frm').form('submit', {    
-	    url:'/orgsave.action',    
-	    onSubmit: function(){    
-	          
-	    },    
-	    success:function(data){    
-	    	reloadtree();
-	    }    
-	}); 
-}
-function deleteorg()
-{
-	var objs = $('#tree').tree('getChecked');
-	if(objs.length == 0)
-	{
-		$.messager.alert('错误','请选中一个需要删除部门');
-		return;
-	}
+	var objs = $('#userdg').datagrid('getChecked');
 	var id = '';
 	for(var i=0;i<objs.length;i++)
 	{
 		id = id + objs[i].id + ',';
 	}
-	console.log('deleteorg()='+objs.length+','+id);
+	console.log('userdelete()='+objs.length+','+id);
 	$.ajax({
-		url:'/orgdelete.action?id='+id,
+		url:'/userdelete.action?id='+id,
 		success:function(data)
 		{
 			$.messager.alert('信息',data);
-			reloadtree();
+			$('#userdg').datagrid('reload');
 		}
 	})
 }
 function reloadtree()
 {
-	//$('#tree').tree('loadData',[{"id":"1","text":"Root","iconCls":null,"url":null,"state":"closed","attributes":{"type":"system","isload":"false","path":"/","parentId":null}}]);
-	$.get('/orgroot.action',function(data)
+	$.get('/userorgroot.action',function(data)
 		{
 			$('#tree').tree({
 				data: data
@@ -161,7 +123,7 @@ $(document).ready(
 					if(node.attributes.isload=='false')
 					{
 						$.ajaxSettings.async = false;
-						var url = '/orgchild.action?id='+node.id;
+						var url = '/userorgchild.action?id='+node.id;
 						$.get(url,function(data)
 							{
 								$('#tree').tree('append', {

@@ -248,23 +248,24 @@ public class DefaultOrgModel implements IOrgModel{
 		return null;
 	}
 	
+	@Override
+	public DefaultUser getUserById(String userId) {
+		try
+		{
+			return mapper.getUserById(userId);
+		}
+		catch(Exception e)
+		{
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+	
 	/**
 	 * 工作流引擎中调用组织机构的方法
 	 * @param userId
 	 * @return
 	 */
-	@Override
-	public IUser getUserById(String userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IUser getUserByLoginId(String flag, String loginId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public List<IOrg> getUserListByOrgId(String orgId, String flag) {
 		// TODO Auto-generated method stub
@@ -819,6 +820,50 @@ public class DefaultOrgModel implements IOrgModel{
 			menuacl.setPath("/func000000000000/func000000001000/func000000001500");
 			menuacl.setFullName("/功能模块/系统管理/菜单授权");
 			this.saveFunc(menuacl);
+		}
+		String fiId = "func000000002000";
+		FunctionInfo fi = getFuncById(fiId);
+		if(fi == null)
+		{
+			fi = new FunctionInfo();
+			fi.setId(fiId);
+			fi.setName("财务管理");
+			fi.setIcon("pic_20");
+			fi.setParentId(root.getId());
+			fi.setPriority(1);
+			fi.setPath("/func000000000000/func000000002000");
+			fi.setFullName("/功能模块/财务管理");
+			this.saveFunc(fi);
+		}
+		String workitemId = "func000000002100";
+		FunctionInfo workitem = getFuncById(workitemId);
+		if(workitem == null)
+		{
+			workitem = new FunctionInfo();
+			workitem.setId(workitemId);
+			workitem.setName("代办工作");
+			workitem.setIcon("pic_20");
+			workitem.setParentId(fi.getId());
+			workitem.setPriority(1);
+			workitem.setUrl("/workitem.action");
+			workitem.setPath("/func000000000000/func000000002000/func000000002100");
+			workitem.setFullName("/功能模块/财务管理/财务报销");
+			this.saveFunc(workitem);
+		}
+		String expenseId = "func000000002200";
+		FunctionInfo expense = getFuncById(expenseId);
+		if(expense == null)
+		{
+			expense = new FunctionInfo();
+			expense.setId(expenseId);
+			expense.setName("财务报销");
+			expense.setIcon("pic_21");
+			expense.setParentId(fi.getId());
+			expense.setPriority(2);
+			expense.setUrl("/expense.action");
+			expense.setPath("/func000000000000/func000000002000/func000000002100");
+			expense.setFullName("/功能模块/财务管理/财务报销");
+			this.saveFunc(expense);
 		}
 		return root;
 	}

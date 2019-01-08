@@ -27,6 +27,7 @@ import com.gf.statusflow.IOrgModel;
 import com.gf.statusflow.IUser;
 import com.gf.statusflow.StatusFlowData;
 import com.gf.statusflow.StatusFlowMng;
+import com.gf.statusflow.StatusFlowWAPI;
 import com.gf.statusflow.StatusMsg;
 import com.gf.statusflow.UUID;
 import com.gf.statusflow.Util;
@@ -40,6 +41,8 @@ public class MainCtrl {
 	private StatusFlowMng sfmng;
 	@Autowired
 	private IOrgModel orgmodel;
+	@Autowired
+	private StatusFlowWAPI wapi;
 	
 	@RequestMapping("/")
 	public String login(HttpServletRequest req)
@@ -92,6 +95,29 @@ public class MainCtrl {
     		return "密码错误";
     	}
 
+	}
+	
+	@RequestMapping("/workitem.action")
+	public String workitem()
+	{
+		return "/orgmodel/workitem";
+	}
+	
+	@RequestMapping("/workitemlist.action")
+	@ResponseBody
+	public List workitemlist()
+	{
+		try
+		{
+			IUser user = Util.getLoginUser();
+			String testMode = "no";
+			return wapi.getWorkitemList(user.getId(), testMode);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@RequestMapping("/main.action")
@@ -223,26 +249,5 @@ public class MainCtrl {
 		}
 		return rtn;
 	}
-	
-	@RequestMapping("/expense.action")
-	public String expense(HttpServletRequest req)
-	{
-		StatusMsg wfMsg = null;
-		String userId = "1";
-		String processId = "testwf";
-		String nexttask = null;
-		String instWorkitemId = null;
-		List<Properties> nextBtnList = null;
-		List<Properties> nextActList = null;
-		List<Properties> nextUserSelectList = null;
-		HashMap hmap = null;
-		StatusFlowData wfdata = sfmng.getWorkflowData(userId, processId, nexttask, instWorkitemId,hmap);
-		nextBtnList = wfdata.getNextBtnList();
-		nextActList = wfdata.getNextActList();
-		System.out.println("nextBtnList="+nextBtnList);
-		System.out.println("nextActList="+nextActList);
-		
-		req.setAttribute("button", nextBtnList);
-		return "/fi/expense";
-	}
+
 }

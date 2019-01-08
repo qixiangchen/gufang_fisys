@@ -88,3 +88,18 @@ create table gf_perm2role(id varchar(32),
 create table gf_menu2role(id varchar(32),
 	funcid varchar(32),
 	roleid varchar(32));
+	
+create table gf_expense(id varchar(32),
+	name varchar(100),
+	company varchar(100),
+	bank varchar(100),
+	bankaccount varchar(100),
+	amount decimal(10,2),
+	userId varchar(100)
+);
+
+create table gf_holiday (
+	id varchar(32),
+	createDt date,
+	`days` int,
+	reason varchar(500)); 

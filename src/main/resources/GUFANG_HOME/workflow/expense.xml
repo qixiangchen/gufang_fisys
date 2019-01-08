@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="gb2312"?>
+<!--
+注意:
+流程触发外部接口,其类加载器必须位于工作流引擎类加载器平级或者更高一级
+-->
+<process id="expense" name="请款流程" description="">
+	<status id="Start" name="开始" type="synchronized" isstart="true">
+		<tostatuses>
+			<tostatus batchid="tomanager" id="account" name="财务审批" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="sendmail"/>
+		</tostatuses>
+		<actors>
+		</actors>
+	</status>
+	<status id="draft" name="修改" type="synchronized" isstart="false">
+		<tostatuses>
+			<tostatus batchid="tomanager" id="account" name="财务审批" condition="false" invoke="" invokecommand=""/>
+			<tostatus batchid="destory" id="destory" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+		</tostatuses>
+		<actors>
+			<actor type="variable" id="starter"/>
+		</actors>
+	</status>
+	<status id="account" name="财务审批" type="asynchronized" isstart="false">
+		<tostatuses>
+			<tostatus batchid="vp" id="vp" name="副总审批" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+			<tostatus batchid="destory" id="destory" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+			<tostatus batchid="tostarter" id="draft" name="返回修改" condition="false" invoke="" invokecommand=""/>
+		</tostatuses>
+		<actors>
+			<actor type="user" loginid="fiadmin"/>
+		</actors>
+	</status>
+	<status id="vp" name="副总审批" type="asynchronized" isstart="false">
+		<tostatuses>
+			<tostatus batchid="tonotice" id="notice" name="通知申请人" condition="false" invoke="" invokecommand=""/>
+			<tostatus batchid="tostarter" id="draft" name="返回修改" condition="false" invoke="" invokecommand=""/>
+			<tostatus batchid="destory" id="destory" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="orderdestory"/>
+		</tostatuses>
+		<actors>
+			<actor type="user" loginid="sysadmin"/>
+		</actors>
+	</status>
+	<status id="notice" name="通知申请人" type="asynchronized" isstart="false" workflow="outstore" condition="storeName EQ '发货库A（运达）'">
+		<tostatuses>
+			<tostatus batchid="end" id="end" name="完成" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="outstore"/>
+			<tostatus batchid="destory" id="destory" name="作废" condition="false" invoke="com.gf.statusflow.TestInvokeApp" invokecommand="outstoredestory"/>
+		</tostatuses>
+		<actors>
+			<actor type="variable" id="starter"/>
+		</actors>
+	</status>
+	<status id="destory" name="作废" type="synchronized" isstart="false">
+		<tostatuses>
+		</tostatuses>
+		<actors>
+		</actors>
+	</status>
+	<status id="end" name="结束" type="synchronized" isstart="false">
+		<tostatuses>
+		</tostatuses>
+		<actors>
+		</actors>
+	</status>
+</process>

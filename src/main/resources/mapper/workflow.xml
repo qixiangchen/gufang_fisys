@@ -255,6 +255,9 @@
 	<select id="checkLogin" resultType="com.gf.statusflow.def.DefaultUser">
 		select * from gf_user where loginid=#{loginId} and password=#{password}
 	</select>
+	<select id="getUserById" resultType="com.gf.statusflow.def.DefaultUser">
+		select * from gf_user where id=#{id}
+	</select>
 	
 	<!-- 角色相关SQL -->
 	<insert id="saveRole" parameterType="com.gf.statusflow.def.DefaultRole">
