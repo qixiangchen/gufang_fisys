@@ -24,6 +24,7 @@ import com.gf.statusflow.StatusFlowWAPI;
 import com.gf.statusflow.StatusMsg;
 import com.gf.statusflow.def.DefWorkItem;
 
+//测试类
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=Starter.class)
 public class Tester
