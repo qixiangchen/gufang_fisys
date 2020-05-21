@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 //SpringBoot启动类
+//新代码
 @SpringBootApplication
 public class Starter 
 {
