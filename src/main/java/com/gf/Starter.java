@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //SpringBoot启动类
 //新代码
 //add by chenqx
+//新的修改2020-05-22
 @SpringBootApplication
 public class Starter 
 {
