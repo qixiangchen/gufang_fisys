@@ -24,7 +24,6 @@ import com.gf.statusflow.StatusFlowWAPI;
 import com.gf.statusflow.StatusMsg;
 import com.gf.statusflow.def.DefWorkItem;
 
-//用户A修改代码
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=Starter.class)
 public class Tester
@@ -35,8 +34,11 @@ public class Tester
 	private IOrgModel orgmodel;
 	@Autowired
 	private StatusFlowMng sfmng;
+
 	//用户A第二次修改代码
 		
+	//用户B第二次修改	
+
     @Test
     public void testMethod()
     {
