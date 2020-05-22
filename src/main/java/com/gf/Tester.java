@@ -24,21 +24,17 @@ import com.gf.statusflow.StatusFlowWAPI;
 import com.gf.statusflow.StatusMsg;
 import com.gf.statusflow.def.DefWorkItem;
 
-//测试类
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=Starter.class)
 public class Tester
 {
-	//add git
 	@Autowired
 	private StatusFlowWAPI wapi;
 	@Autowired
 	private IOrgModel orgmodel;
 	@Autowired
 	private StatusFlowMng sfmng;
-	
-    //add git
-	
+		
     @Test
     public void testMethod()
     {
