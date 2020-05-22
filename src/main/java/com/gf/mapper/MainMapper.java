@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.gf.model.FunctionInfo;
 import com.gf.statusflow.def.DefaultOrg;
 
+//add git
 @Mapper
 public interface MainMapper {
 	public FunctionInfo getRoot();

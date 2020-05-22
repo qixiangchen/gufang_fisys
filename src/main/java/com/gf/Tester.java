@@ -36,6 +36,8 @@ public class Tester
 	@Autowired
 	private StatusFlowMng sfmng;
 	
+    //add git
+	
     @Test
     public void testMethod()
     {
