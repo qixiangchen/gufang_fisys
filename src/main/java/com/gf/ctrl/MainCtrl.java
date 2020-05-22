@@ -6,7 +6,7 @@ import java.util.Properties;
 
 
 /*
-		ÎÒ½ÐÑ¦ÑôÑô
+		ï¿½Ò½ï¿½Ñ¦ï¿½ï¿½ï¿½ï¿½
 */
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +21,7 @@ import com.gf.statusflow.StatusFlowData;
 import com.gf.statusflow.StatusFlowMng;
 import com.gf.statusflow.StatusMsg;
 
+//add git
 @Controller
 public class MainCtrl {
 	@Autowired
